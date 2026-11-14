@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>清明上河图 · 三维</title>
+<style>
+@font-face{font-family:'WenKai';src:url(data:font/woff2;base64,/*FONT*/) format('woff2');font-display:block}
+:root{--ink:#2b2013;--paper:#e8dcb8;--paper2:#d9c895;--seal:#a8402e;--gold:#b08d4a}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;overflow:hidden;background:#c9b68a;font-family:'WenKai','KaiTi','STKaiti',serif;color:var(--ink);touch-action:none;user-select:none;-webkit-user-select:none}
+#stage{position:fixed;inset:0}#stage canvas{display:block;width:100%;height:100%;touch-action:none}
+#silk{position:fixed;inset:0;pointer-events:none;mix-blend-mode:multiply;opacity:.32}
+#vig{position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 45%,rgba(0,0,0,0) 55%,rgba(60,40,10,.3) 100%)}
+#loading{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#cdbb8e;font-size:28px;letter-spacing:.3em;z-index:50;transition:opacity .8s}
+#loading.done{opacity:0;pointer-events:none}
+#segBox{position:fixed;left:18px;top:16px;max-width:min(380px,60vw);padding:12px 18px 12px 16px;background:linear-gradient(90deg,rgba(236,224,190,.92),rgba(236,224,190,.78));border:1px solid rgba(110,80,40,.5);border-left:5px solid var(--seal);box-shadow:0 2px 10px rgba(60,40,10,.3);transition:opacity .18s;pointer-events:none}
+#segBox.swap{opacity:0}
+#segName{font-size:28px;letter-spacing:.2em;font-weight:bold;margin-bottom:6px}
+#segDesc{font-size:14px;line-height:1.7;color:#4a3a22}
+#bigTitle{position:fixed;right:20px;top:16px;writing-mode:vertical-rl;font-size:34px;letter-spacing:.35em;padding:16px 10px;background:rgba(168,64,46,.9);color:#f3e7c6;box-shadow:0 2px 10px rgba(60,40,10,.35);border:2px solid #7a2a1c;pointer-events:none;line-height:1.1}
+#bigTitle small{font-size:13px;letter-spacing:.2em;margin-top:.8em;display:block;opacity:.85}
+#hint{position:fixed;left:50%;bottom:108px;transform:translateX(-50%);padding:8px 18px;background:rgba(40,28,12,.66);color:#f2e6c4;border-radius:3px;font-size:14px;letter-spacing:.08em;transition:opacity 1.2s;pointer-events:none;text-align:center;max-width:92vw}
+#hint.off{opacity:0}
+#nav{position:fixed;left:0;right:0;bottom:0;height:84px;background:#2c2113;border-top:2px solid #6a5028;cursor:pointer;touch-action:none}
+#navimg{position:absolute;inset:18px 0 4px 0;background-image:url(data:image/jpeg;base64,/*THUMB*/);background-size:100% 100%;filter:sepia(.1) saturate(.9)}
+#navsegs{position:absolute;left:0;right:0;top:0;height:18px;display:flex;font-size:12px;letter-spacing:.3em;color:#cdb98a;pointer-events:none}
+.navseg{flex:0 0 auto;text-align:center;line-height:18px;border-left:1px solid rgba(205,185,138,.4);overflow:hidden;white-space:nowrap;transition:color .3s,background .3s}
+.navseg.cur{color:#fff1c8;background:rgba(168,64,46,.55)}
+.navdiv{position:absolute;top:18px;bottom:4px;width:0;border-left:1px dashed rgba(255,240,200,.6);pointer-events:none}
+#navbox{position:absolute;top:14px;bottom:0;min-width:10px;border:2px solid #f3e1a6;background:rgba(255,240,190,.18);box-shadow:0 0 0 9999px rgba(30,20,8,.42);pointer-events:none;border-radius:2px}
+#panel{position:fixed;right:12px;bottom:96px;width:210px;background:rgba(236,224,190,.94);border:1px solid rgba(110,80,40,.55);box-shadow:0 2px 10px rgba(60,40,10,.3);font-size:14px}
+#panelHead{padding:7px 12px;cursor:pointer;letter-spacing:.3em;font-weight:bold;display:flex;justify-content:space-between;border-bottom:1px solid rgba(110,80,40,.3)}
+#panelHead:after{content:'▾'}#panel.closed #panelHead:after{content:'▴'}#panel.closed #panelBody{display:none}#panel.closed #panelHead{border-bottom:0}
+#panelBody{padding:8px 12px 12px}
+#panelBody label{display:flex;align-items:center;gap:8px;margin:6px 0}#panelBody label span{width:34px;flex:none}
+input[type=range]{flex:1;min-width:0;accent-color:#a8402e;height:22px}
+.btns{display:flex;gap:8px;margin-top:8px}
+.btns button{flex:1;font:inherit;padding:5px 0;background:#d9c895;border:1px solid #8a6a38;color:var(--ink);cursor:pointer;letter-spacing:.2em;border-radius:2px}
+.btns button.on{background:#a8402e;color:#f6e9c6;border-color:#6a2a1c}
+#tags{position:fixed;inset:0;pointer-events:none;overflow:hidden}
+.tag{position:absolute;left:0;top:0;writing-mode:vertical-rl;padding:7px 3px;background:#eadbb0;border:1px solid #6a4a28;border-top:3px solid var(--seal);color:#2a1d0e;font-size:15px;letter-spacing:.15em;box-shadow:0 1px 5px rgba(40,25,5,.4);white-space:nowrap;transition:opacity .25s;visibility:hidden;opacity:0}
+@media (max-width:700px){#segName{font-size:22px}#segDesc{font-size:12.5px;line-height:1.55}#segBox{padding:8px 12px;left:10px;top:10px;max-width:68vw}#bigTitle{font-size:24px;right:10px;top:10px;padding:10px 7px}#bigTitle small{display:none}#hint{bottom:140px;font-size:12px}#panel{width:190px;bottom:92px;right:8px}#nav{height:72px}}
+</style>
+</head>
+<body>
+<div id="stage"></div>
+<canvas id="silk"></canvas><div id="vig"></div>
+<div id="tags"></div>
+<div id="segBox"><div id="segName">郊野春色</div><div id="segDesc"></div></div>
+<div id="bigTitle">清明上河图<small>北宋·张择端</small></div>
+<div id="hint">左键拖动：平移　右键或 Shift 拖动：转视角、俯仰　滚轮：缩放<br>触屏：单指平移，双指缩放、旋转、俯仰　方向键、加减号亦可</div>
+<div id="panel"><div id="panelHead">视角</div><div id="panelBody">
+<label><span>缩放</span><input id="sZoom" type="range" min="0" max="1000" value="500"></label>
+<label><span>俯仰</span><input id="sPitch" type="range" min="10" max="150" value="62"></label>
+<label><span>旋转</span><input id="sYaw" type="range" min="-314" max="314" value="0"></label>
+<div class="btns"><button id="btnTag">题签</button><button id="btnReset">复位</button></div></div></div>
+<div id="nav"><div id="navimg"></div><div id="navsegs"></div><div id="navbox"></div></div>
+<div id="loading">正在铺开长卷……</div>
+<script>/*THREE*/</script>
+<script>
+(function(){
+// 全卷导航：三段标识
+(function(){const segs=[['郊野春色',0,0.26],['汴河虹桥',0.26,0.66],['城门街市',0.66,1]];const c=document.getElementById('navsegs');
+  // 导航条左→右 = 世界 x 增大 = t 减小
+  segs.slice().reverse().forEach(s=>{const d=document.createElement('div');d.className='navseg';d.textContent=s[0];d.style.width=((s[2]-s[1])*100)+'%';c.appendChild(d)});
+  const nav=document.getElementById('nav');[0.34,0.74].forEach(f=>{const d=document.createElement('div');d.className='navdiv';d.style.left=(f*100)+'%';nav.appendChild(d)});
+  // 绢本纹理
+  const s=document.getElementById('silk'),w=256,h=256;const t=document.createElement('canvas');t.width=w;t.height=h;const x=t.getContext('2d');x.fillStyle='#e6d6ac';x.fillRect(0,0,w,h);
+  for(let i=0;i<w;i+=2){x.fillStyle='rgba(120,90,40,'+(Math.random()*.09)+')';x.fillRect(i,0,1,h)}for(let j=0;j<h;j+=2){x.fillStyle='rgba(120,90,40,'+(Math.random()*.09)+')';x.fillRect(0,j,w,1)}
+  for(let i=0;i<900;i++){x.fillStyle='rgba(90,60,20,'+Math.random()*.12+')';x.fillRect(Math.random()*w,Math.random()*h,1+Math.random()*2,1)}
+  s.width=innerWidth;s.height=innerHeight;const sx=s.getContext('2d');const p=sx.createPattern(t,'repeat');sx.fillStyle=p;sx.fillRect(0,0,s.width,s.height);
+  addEventListener('resize',()=>{s.width=innerWidth;s.height=innerHeight;const q=s.getContext('2d');q.fillStyle=q.createPattern(t,'repeat');q.fillRect(0,0,s.width,s.height)});
+})();
+/*APP*/
+})();
+</script>
+</body>
+</html>

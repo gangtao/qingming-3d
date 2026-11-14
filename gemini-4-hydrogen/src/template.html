@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>清明上河图 · 三维长卷</title>
+  <style>
+    :root {
+      --silk-bg: #d6c4a2;
+      --paper-panel: rgba(236, 224, 198, 0.88);
+      --ink-dark: #2c2117;
+      --ink-mid: #5a4632;
+      --cinnabar: #8c3c2d;
+      --border-warm: rgba(94, 70, 44, 0.42);
+      --font-kai: "LXGW WenKai", "LXGW WenKai Screen", "Kaiti SC", "STKaiti", "KaiTi", "楷体", "DFKai-SB", serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: var(--silk-bg);
+      color: var(--ink-dark);
+      font-family: var(--font-kai);
+      touch-action: none;
+    }
+
+    #canvas-wrap {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+    }
+
+    /* 题签悬浮标签层 */
+    #labels-layer {
+      position: fixed;
+      inset: 0;
+      z-index: 5;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .landmark-tag {
+      position: absolute;
+      top: 0;
+      left: 0;
+      padding: 2px 8px;
+      font-size: 13px;
+      line-height: 1.4;
+      letter-spacing: 0.08em;
+      color: var(--ink-dark);
+      background: rgba(242, 232, 210, 0.86);
+      border: 1px solid rgba(110, 82, 50, 0.55);
+      border-radius: 2px;
+      box-shadow: 0 2px 6px rgba(42, 30, 18, 0.18);
+      white-space: nowrap;
+      pointer-events: none;
+    }
+    .landmark-tag::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      bottom: -5px;
+      transform: translateX(-50%);
+      border-width: 5px 4px 0 4px;
+      border-style: solid;
+      border-color: rgba(110, 82, 50, 0.55) transparent transparent transparent;
+    }
+
+    /* 左上角段落说明 */
+    #section-box {
+      position: fixed;
+      top: 16px;
+      left: 16px;
+      z-index: 10;
+      max-width: min(360px, calc(100vw - 100px));
+      padding: 10px 14px;
+      background: var(--paper-panel);
+      border: 1px solid var(--border-warm);
+      border-left: 3px solid var(--cinnabar);
+      border-radius: 3px;
+      backdrop-filter: blur(4px);
+      box-shadow: 0 3px 10px rgba(45, 32, 18, 0.14);
+      pointer-events: none;
+    }
+    #sec-title {
+      font-size: 17px;
+      font-weight: bold;
+      letter-spacing: 0.08em;
+      color: var(--cinnabar);
+      margin-bottom: 4px;
+    }
+    #sec-desc {
+      font-size: 13px;
+      line-height: 1.55;
+      color: var(--ink-mid);
+    }
+
+    /* 右上角竖排题名 */
+    #scroll-title {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      z-index: 10;
+      writing-mode: vertical-rl;
+      text-orientation: upright;
+      padding: 12px 9px;
+      font-size: 22px;
+      font-weight: bold;
+      letter-spacing: 0.22em;
+      color: var(--ink-dark);
+      background: var(--paper-panel);
+      border: 1px solid var(--border-warm);
+      box-shadow: 0 3px 10px rgba(45, 32, 18, 0.16);
+      pointer-events: none;
+    }
+    #scroll-title::after {
+      content: "北宋·张择端";
+      display: block;
+      margin-top: 8px;
+      font-size: 11px;
+      font-weight: normal;
+      letter-spacing: 0.14em;
+      color: var(--cinnabar);
+    }
+
+    /* 首次操作提示（操作后淡出） */
+    #hint-banner {
+      position: fixed;
+      top: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 12;
+      padding: 7px 16px;
+      font-size: 13px;
+      letter-spacing: 0.05em;
+      color: #f6ecd7;
+      background: rgba(58, 42, 27, 0.82);
+      border: 1px solid rgba(226, 206, 170, 0.35);
+      border-radius: 20px;
+      pointer-events: none;
+      transition: opacity 0.65s ease;
+      white-space: nowrap;
+      max-width: 90vw;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    #hint-banner.hidden {
+      opacity: 0;
+    }
+
+    /* 右下角可折叠视角面板 */
+    #view-panel {
+      position: fixed;
+      right: 16px;
+      bottom: 88px;
+      z-index: 15;
+      width: 226px;
+      background: var(--paper-panel);
+      border: 1px solid var(--border-warm);
+      border-radius: 4px;
+      box-shadow: 0 4px 14px rgba(42, 30, 18, 0.20);
+      backdrop-filter: blur(5px);
+      overflow: hidden;
+    }
+    #panel-toggle {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 12px;
+      border: none;
+      background: rgba(140, 60, 45, 0.08);
+      color: var(--ink-dark);
+      font-family: var(--font-kai);
+      font-size: 15px;
+      font-weight: bold;
+      letter-spacing: 0.1em;
+      cursor: pointer;
+    }
+    #panel-toggle .arrow {
+      transition: transform 0.25s ease;
+    }
+    #view-panel.collapsed #panel-toggle .arrow {
+      transform: rotate(180deg);
+    }
+    #panel-body {
+      padding: 10px 12px 12px;
+      border-top: 1px solid var(--border-warm);
+    }
+    #view-panel.collapsed #panel-body {
+      display: none;
+    }
+
+    .ctrl-row {
+      margin-bottom: 9px;
+    }
+    .ctrl-row label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      color: var(--ink-mid);
+      margin-bottom: 3px;
+    }
+    .ctrl-row input[type="range"] {
+      width: 100%;
+      accent-color: var(--cinnabar);
+      cursor: pointer;
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .btn-row button {
+      flex: 1;
+      padding: 6px 0;
+      font-family: var(--font-kai);
+      font-size: 13px;
+      letter-spacing: 0.12em;
+      color: var(--ink-dark);
+      background: rgba(255, 250, 238, 0.65);
+      border: 1px solid var(--border-warm);
+      border-radius: 3px;
+      cursor: pointer;
+    }
+    .btn-row button.active {
+      background: var(--cinnabar);
+      color: #f7eedc;
+      border-color: var(--cinnabar);
+    }
+
+    /* 底部全卷通栏缩略图导航条 */
+    #minimap-bar {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 74px;
+      z-index: 16;
+      background: #c7b28b;
+      border-top: 2px solid rgba(78, 56, 34, 0.65);
+      box-shadow: 0 -3px 12px rgba(36, 24, 12, 0.22);
+      display: flex;
+      flex-direction: column;
+    }
+    #minimap-wrap {
+      position: relative;
+      flex: 1;
+      width: 100%;
+      cursor: grab;
+      overflow: hidden;
+    }
+    #minimap-wrap:active {
+      cursor: grabbing;
+    }
+    #minimap-canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    #minimap-viewport {
+      position: absolute;
+      top: 2px;
+      bottom: 2px;
+      border: 2px solid var(--cinnabar);
+      background: rgba(140, 60, 45, 0.14);
+      box-shadow: 0 0 0 9999px rgba(45, 34, 20, 0.22);
+      pointer-events: none;
+    }
+    #minimap-labels {
+      height: 20px;
+      display: grid;
+      grid-template-columns: 39% 32% 29%;
+      background: rgba(235, 222, 194, 0.92);
+      border-top: 1px solid var(--border-warm);
+      font-size: 12px;
+      line-height: 20px;
+      color: var(--ink-mid);
+      text-align: center;
+      letter-spacing: 0.14em;
+    }
+    #minimap-labels span:not(:last-child) {
+      border-right: 1px dashed var(--border-warm);
+    }
+
+    #load-error {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 99;
+      background: var(--silk-bg);
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 24px;
+      font-size: 16px;
+      line-height: 1.8;
+    }
+
+    @media (max-width: 767px) {
+      #section-box { max-width: calc(100vw - 88px); padding: 8px 10px; }
+      #sec-title { font-size: 15px; }
+      #sec-desc { font-size: 12px; }
+      #scroll-title { font-size: 18px; padding: 8px 6px; }
+      #hint-banner { display: none; }
+      #view-panel { width: 196px; bottom: 82px; right: 10px; }
+    }
+  </style>
+</head>
+<body>
+  <div id="canvas-wrap"></div>
+  <div id="labels-layer"></div>
+
+  <div id="section-box">
+    <div id="sec-title">第一段 · 郊野春色</div>
+    <div id="sec-desc">开卷薄雾疏林，驮炭毛驴队踏过村桥，茅舍石碾与清明扫墓归来的轿队相映成趣。</div>
+  </div>
+
+  <div id="scroll-title">清明上河图</div>
+
+  <div id="hint-banner">左键拖动平移 · 右键或 Shift+拖动旋转俯仰 · 滚轮缩放 · 方向键与 +/- 亦可浏览</div>
+
+  <div id="view-panel">
+    <button id="panel-toggle" type="button">
+      <span>视角</span>
+      <span class="arrow">▾</span>
+    </button>
+    <div id="panel-body">
+      <div class="ctrl-row">
+        <label for="slider-zoom"><span>缩放</span><span>近 ↔ 远</span></label>
+        <input id="slider-zoom" type="range" min="8" max="210" step="1" value="42" />
+      </div>
+      <div class="ctrl-row">
+        <label for="slider-pitch"><span>俯仰</span><span>平视 ↔ 俯瞰</span></label>
+        <input id="slider-pitch" type="range" min="8" max="78" step="1" value="28" />
+      </div>
+      <div class="ctrl-row">
+        <label for="slider-yaw"><span>旋转</span><span>左 ↔ 右</span></label>
+        <input id="slider-yaw" type="range" min="-180" max="180" step="1" value="0" />
+      </div>
+      <div class="btn-row">
+        <button id="btn-labels" class="active" type="button">题签</button>
+        <button id="btn-reset" type="button">复位</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="minimap-bar">
+    <div id="minimap-wrap" title="点击或拖动跳转画卷位置">
+      <canvas id="minimap-canvas"></canvas>
+      <div id="minimap-viewport"></div>
+    </div>
+    <div id="minimap-labels">
+      <span>城门街市</span>
+      <span>汴河虹桥</span>
+      <span>郊野春色</span>
+    </div>
+  </div>
+
+  <div id="load-error">
+    未能加载 Three.js（r128）。请检查网络连接，或使用 <code>build.py --inline-three three.min.js</code> 将引擎内嵌至单页后离线打开。
+  </div>
+
+  {{THREE_SCRIPT}}
+  {{MODULES_SCRIPT}}
+  <script>
+    window.addEventListener('DOMContentLoaded', function () {
+      if (window.QM && window.QM.startApp) {
+        window.QM.startApp();
+      }
+    });
+  </script>
+</body>
+</html>

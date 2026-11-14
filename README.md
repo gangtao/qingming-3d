@@ -14,6 +14,7 @@
 | [`sonnet-5.5/`](sonnet-5.5/) | Claude Sonnet 5.5 | 同上 |
 | [`haiku-5.5/`](haiku-5.5/) | Claude Haiku 5.5 | 同上 |
 | [`gpt-6-astra/`](gpt-6-astra/) | GPT-6 Astra | 按合并提示词和参照图生成，额度中断后在原会话续跑 |
+| [`gemini-4-hydrogen/`](gemini-4-hydrogen/) | Gemini 4 Hydrogen | Google AI Studio 对话三轮，模型没有运行环境；原样构建黑屏，改一个名字后可看，详见该目录的说明 |
 
 ## 怎么看
 

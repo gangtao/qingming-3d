@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>三维《清明上河图》模型对照</title>
+<style>
+:root{--bg:#efe6d2;--ink:#2a2018;--sub:#6b5a48;--card:#f7f0e0;--line:#cbb994;--seal:#a8321f}
+@media (prefers-color-scheme:dark){:root{--bg:#1d1813;--ink:#eadfc8;--sub:#a8987f;--card:#28211a;--line:#4a3d2e;--seal:#d0553f}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"LXGW WenKai","Kaiti SC","STKaiti",KaiTi,serif;line-height:1.7}
+main{max-width:760px;margin:0 auto;padding:56px 16px 72px}
+h1{font-size:34px;margin:0 0 8px;letter-spacing:.06em;text-wrap:balance}
+p{margin:0 0 20px;color:var(--sub)}
+ul{list-style:none;padding:0;margin:28px 0}
+li a{display:block;background:var(--card);border:1px solid var(--line);border-radius:6px;overflow:hidden;color:inherit;text-decoration:none;margin-bottom:16px}
+li a:hover{border-color:var(--seal)}
+li img{display:block;width:100%;aspect-ratio:16/9;object-fit:cover}
+li div{padding:12px 16px}
+li b{font-size:20px}
+li span{display:block;color:var(--sub);font-size:15px}
+.links a{color:var(--seal)}
+</style>
+</head>
+<body>
+<main>
+<h1>三维《清明上河图》</h1>
+<p>同一份提示词，不同模型用 three.js 做出来的三维长卷。点开就能拖动浏览，每个人物、牲口、车船都会动。</p>
+<ul>
+<li><a href="fable-5.2/"><img src="fable-5.2/preview/hongqiao-v4.png" alt="汴河虹桥一段的截图"><div><b>Claude Fable 5.2</b><span>八轮对话做成</span></div></a></li>
+</ul>
+<p class="links"><a href="https://github.com/gangtao/qingming-3d/blob/main/PROMPT.md">提示词</a> · <a href="https://github.com/gangtao/qingming-3d">源码仓库</a></p>
+</main>
+</body>
+</html>

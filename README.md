@@ -62,6 +62,20 @@ Astra 使用 Codex CLI 和 High 推理强度，输入为合并版 `PROMPT.md` �
 
 在仓库根目录运行 `python3 gpt-6-astra/build.py` 即可从模块源码重新生成离线单页。构建使用仓库内的原画缩略图、Three.js 和已生成的字体子集。[预览截图](gpt-6-astra/preview)来自 Chrome 断网模式下的软件渲染。
 
+## 对 Gemini 4 Hydrogen 版的一处修复
+
+Gemini 是在 Google AI Studio 的对话里写出源码的，没有运行环境，不能自己构建和自查。它给的代码原样构建后打开是黑屏，报错 `ReferenceError: hatDouliGeo is not defined`：斗笠的几何体定义时叫 `douliGeo`，引用时写成了 `hatDouliGeo`。
+
+为了能对照观看，发布的 `gemini-4-hydrogen/index.html` 改了这一个名字，别的都没动：
+
+```diff
+ // src/03-entities.js 第 134 行
+-      hatPutouGeo, hatBunGeo, hatDouliGeo, hatScarfGeo,
++      hatPutouGeo, hatBunGeo, hatDouliGeo: douliGeo, hatScarfGeo,
+```
+
+`gemini-4-hydrogen/src/` 里保留的是没改的原文，`gemini-4-hydrogen/index.original.html` 是原样构建的黑屏版。其他各版都没有人工改动。
+
 ## Token 消耗
 
 下表汇总使用合并提示词的各版用量。Claude 各版按模型调用去重后逐条加总，Astra 取 Codex CLI 会话日志的最后一笔累计值。“新输入”是没有命中缓存的输入加上写入缓存的部分；“缓存读取”是每一步重复带上的对话上下文，按次累计，所以数字很大，计费时比新输入便宜得多。

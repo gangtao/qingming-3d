@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>清明上河图 · 三维长卷</title>
+<style>
+/*__FONT__*/
+/*__CSS__*/
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="labels"></div>
+<div id="info"><div id="sec"></div><div id="sub"></div><div id="desc"></div></div>
+<div id="title">清明上河图<span>北宋 · 张择端</span></div>
+<div id="hint"></div>
+<div id="panel">
+  <button id="panelHead" type="button"><span>视角</span><i id="panelArrow">▾</i></button>
+  <div id="panelBody">
+    <label><span>缩放</span><input id="sZoom" type="range" min="0" max="1000" value="400"></label>
+    <label><span>俯仰</span><input id="sPitch" type="range" min="3" max="88" value="35"></label>
+    <label><span>旋转</span><input id="sYaw" type="range" min="-180" max="180" value="0"></label>
+    <div class="btns"><button id="bLabels" type="button" class="on">题签</button><button id="bReset" type="button">复位</button></div>
+  </div>
+</div>
+<div id="nav">
+  <div id="navImg"></div>
+  <div id="navSecs"></div>
+  <div id="navBox"></div>
+</div>
+<div id="loading"><div>清明上河图</div><p id="loadMsg">展卷中……</p></div>
+<script>/*__THREE__*/</script>
+<script>window.QM_THUMB="/*__THUMB__*/";</script>
+<script>
+/*__JS__*/
+</script>
+</body>
+</html>

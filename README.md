@@ -2,31 +2,94 @@
 
 用 three.js 把北宋张择端的《清明上河图》做成可以拖动浏览的三维长卷，每个人物、牲口、车船都会动。这个仓库用来比较不同模型拿到同一份提示词后的输出。
 
-- [`PROMPT.md`](PROMPT.md)：给模型的提示词。
+**在线对照：<https://gangtao.github.io/qingming-3d/>**
+
+## 目录
+
+- [仓库里有什么](#仓库里有什么)
+- [各版本一览](#各版本一览)
+- [对照数据](#对照数据)
+- [各版本是怎么做出来的](#各版本是怎么做出来的)
+- [发布前做过的修复](#发布前做过的修复)
+- [怎么看](#怎么看)
+- [素材和许可](#素材和许可)
+
+## 仓库里有什么
+
+- [`PROMPT.md`](PROMPT.md)：给模型的提示词。它是事后把多轮版八轮对话的要求合成的一份。
 - [`ref/`](ref/)：原画参照图（故宫本全卷）。`overview.jpg` 是全卷缩略，`tile-01.jpg` 到 `tile-16.jpg` 从卷首（最右）排到卷尾（最左）。
-- 每个模型一个目录，目录名就是模型名，里面至少有一个能直接打开的 `index.html`。
+- 每个版本一个目录，里面至少有一个能直接打开的 `index.html`，外加源码和 `preview/` 截图。
+- `index.html`：在线对照页的首页。
 
-| 目录 | 模型 | 说明 |
-| --- | --- | --- |
-| [`fable-5.2/`](fable-5.2/) | Claude Fable 5.2 | 多轮对话做成，见下 |
-| [`fable-5.2-oneshot/`](fable-5.2-oneshot/) | Claude Fable 5.2 | 拿合并提示词和参照图一轮做完，中间没有人工反馈，和下面三版流程相同 |
-| [`opus-5.5/`](opus-5.5/) | Claude Opus 5.5 | 拿合并提示词和参照图一轮做完，中间没有人工反馈 |
-| [`sonnet-5.5/`](sonnet-5.5/) | Claude Sonnet 5.5 | 同上 |
-| [`haiku-5.5/`](haiku-5.5/) | Claude Haiku 5.5 | 同上 |
-| [`gpt-6-astra/`](gpt-6-astra/) | GPT-6 Astra | 按合并提示词和参照图生成，额度中断后在原会话续跑 |
-| [`gemini-4-hydrogen/`](gemini-4-hydrogen/) | Gemini 4 Hydrogen | Google AI Studio 对话三轮，模型没有运行环境；原样构建黑屏，改一个名字后可看，详见该目录的说明 |
-| [`gemini-4-carbon/`](gemini-4-carbon/) | Gemini 4 Carbon | Google AI Studio 对话 7 轮（回答被截断后靠“继续”写完），模型没有运行环境；原样拼接后每帧报错、画面不全，补上实例颜色后可看，详见该目录的说明 |
-| [`deepseek/`](deepseek/) | DeepSeek（网页版，版本号不详） | chat.deepseek.com 对话 13 轮，模型没有运行环境；原样打开黑屏，补一个缺失的几何体后可看，详见该目录的说明 |
+## 各版本一览
 
-## 怎么看
+| 目录 | 模型 | 生成方式 | 轮数 | 发布前有无修复 |
+| --- | --- | --- | ---: | --- |
+| [`fable-5.2/`](fable-5.2/) | Claude Fable 5.2 | 有人反馈的多轮对话，逐步改成 | 8 | 无 |
+| [`fable-5.2-oneshot/`](fable-5.2-oneshot/) | Claude Fable 5.2 | 独立子任务，有运行环境，自己截图自查 | 1 | 无 |
+| [`opus-5.5/`](opus-5.5/) | Claude Opus 5.5 | 同上 | 1 | 无 |
+| [`sonnet-5.5/`](sonnet-5.5/) | Claude Sonnet 5.5 | 同上 | 1 | 无 |
+| [`haiku-5.5/`](haiku-5.5/) | Claude Haiku 5.5 | 同上 | 1 | 无 |
+| [`gpt-6-astra/`](gpt-6-astra/) | GPT-6 Astra | Codex CLI，额度中断后在原会话续跑 | 1（续跑一次） | 有，两处渲染修复 |
+| [`gemini-4-hydrogen/`](gemini-4-hydrogen/) | Gemini 4 Hydrogen | Google AI Studio 对话，没有运行环境 | 3 | 有，改一个名字 |
+| [`gemini-4-carbon/`](gemini-4-carbon/) | Gemini 4 Carbon | Google AI Studio 对话，没有运行环境 | 7 | 有，补实例颜色 |
+| [`deepseek/`](deepseek/) | DeepSeek（网页版，版本号不详） | chat.deepseek.com 对话，没有运行环境 | 13 | 有，补一个缺失的几何体 |
 
-在线看：<https://gangtao.github.io/qingming-3d/>。
+比较时请留意条件并不完全对等：
 
-或者下载或克隆之后，直接用浏览器打开对应目录下的 `index.html`，不需要服务器。左键拖动平移，右键或 Shift 加拖动转视角，滚轮缩放；底部的缩略图条可以点击或拖动定位。
+- 多轮版 `fable-5.2/` 是八轮人工反馈改出来的，其余各版只拿到合并后的提示词。
+- Claude 的四个一轮版和 Astra 有运行环境，可以自己构建、截图、改错；两版 Gemini 和 DeepSeek 只能在对话里写代码，不能运行。
+- DeepSeek 打不开参照图的 GitHub 链接，全卷图是后来在对话里另外附上的。
 
-## fable-5.2 是怎么做出来的
+## 对照数据
 
-它不是一次生成的，而是八轮对话逐步改出来的，`PROMPT.md` 是事后把这八轮的要求合成的一份。比较别的模型时请留意这个差别：别的模型如果只跑一轮，条件并不完全对等。原始的八轮要求依次是：
+### 规模
+
+| 版本 | 人物 | 牲口 | 船 | 建筑 | 数字来源 |
+| --- | ---: | ---: | ---: | ---: | --- |
+| Fable 5.2（一次性） | 1012 | 62 | 28 | 307 | 模型自报 |
+| Opus 5.5 | 1149 | 143 | 23 | 137 | 模型自报 |
+| Sonnet 5.5 | 756 | 66 | 22 | 409 | 模型自报 |
+| Haiku 5.5 | 375 | 17 | 12 | 72 | 模型自报 |
+| GPT-6 Astra | 695 | 27 | 22 | 67 | 模型自报 |
+| Gemini 4 Hydrogen | 378 | 46 | 14 | 28 | 页面实测 |
+| Gemini 4 Carbon | 721 | 24 | 15 | 46 | 页面实测 |
+| DeepSeek | 148 | 9 | 6 | 29 | 页面实测 |
+
+- “模型自报”是各模型完成时自己汇报的数字，没有逐项核对。
+- “页面实测”是在修复后的页面里数的：加载时创建人物、牲口、船和房屋的函数各被调用了多少次。细分见各自目录的说明。
+- 多轮版 `fable-5.2/` 没有统计。
+
+### Token 和用时
+
+| 版本 | 实际模型 | 模型调用 | 工具调用 | 输出 | 新输入 | 缓存读取 | 合计 | 用时 |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | --- |
+| Fable 5.2（一次性） | `claude-fable-5-2` | 66 | 99 | 332,792 | 1,185,516 | 11,651,722 | 13,170,030 | 约 67 分钟 |
+| Opus 5.5 | `claude-opus-5-5` | 80 | 122 | 248,004 | 994,829 | 13,424,698 | 14,667,531 | 约 54 分钟 |
+| Sonnet 5.5 | `claude-sonnet-5-5` | 44 | 67 | 198,409 | 385,819 | 9,512,834 | 10,097,062 | 约 31 分钟 |
+| Haiku 5.5 | `claude-haiku-5-5` | 36 | 47 | 171,928 | 332,063 | 7,137,262 | 7,641,253 | 约 16 分钟 |
+| GPT-6 Astra | `gpt-6-astra` | 29 | 28 | 42,566 | 79,081 | 2,442,880 | 2,564,527 | 约 12 分钟 |
+| Gemini 4 Hydrogen | `gemini-4-hydrogen` | 3 | 0 | 98,990 | 1,158 | — | 100,148 | 约 12–15 分钟 |
+| Gemini 4 Carbon | `gemini-4-carbon` | 7 | 0 | 167,900 | 1,285 | — | 169,185 | 约 60 分钟（含等待回复） |
+| DeepSeek | 不详（网页版） | 14 | 0 | 不详 | 不详 | — | 不详 | 不详 |
+
+“新输入”是没有命中缓存的输入加上写入缓存的部分。“缓存读取”是每一步重复带上的对话上下文，按次累计，所以数字很大，计费时比新输入便宜得多。
+
+### 统计口径
+
+各行的来源不同，不能都直接相比：
+
+- **Claude 的四个一轮版**：从子任务的运行记录里按模型调用去重后逐条加总，用时是子任务从开始到结束的时间。
+- **GPT-6 Astra**：取 Codex CLI 会话日志的最后一笔累计值。模型调用数以累计用量发生变化的记录计，工具调用数取 CLI 中完成的工具事件（含失败的工具执行）。输出含 5,847 个推理 token。前期多轮试跑另记录 2,143,888 token（含 2,060,800 缓存读取和 41,720 输出），未计入表中。浏览器验收和随后的两处渲染修复在该会话之外完成。运行时长的细分见[下文](#gpt-6-astra)。
+- **两版 Gemini**：取自 AI Studio 页面上的 Token Usage 浮窗。这是整段对话占用上下文的口径：各轮重复带上的历史没有按次累计，也看不出是否包含思考 token，所以和上面几行按调用累计的数字不能直接比。它们没有工具可用，模型调用数就是回答的轮数。用时按对话时间戳估计：Hydrogen 三轮分别在 11:00、11:08、11:12 开始，最后一轮的结束时间页面上看不到；Carbon 从 11:01 到最后一轮的 12:01，中间包含等人回复“继续”的间隔。
+- **DeepSeek**：网页版不显示 token 数和用时，这两项无法统计。能数的只有文字量，14 次回答合计约 33.8 万字符。
+- **多轮版 `fable-5.2/`**：是在一个同时做别的事的长对话里改出来的，用量分不开，没有列入。
+
+## 各版本是怎么做出来的
+
+### Fable 5.2 多轮版
+
+它不是一次生成的，而是八轮对话逐步改出来的。原始的八轮要求依次是：
 
 1. 用 three.js 做 3D 版清明上河图，每个人物都会动。
 2. 视角太高看不到河，细节不够，近看远看差别小。
@@ -46,94 +109,17 @@
 
 只在软件渲染的无头浏览器里检查过画面，没有在真机上测过帧率。
 
-## 一轮完成的四版是怎么做出来的
+### Claude 的四个一轮版
 
-各起一个独立的子任务（Opus、Sonnet、Haiku 在 2026-11-13，Fable 在 2026-11-14，说明文字一字不差），只给 `PROMPT.md` 和 `ref/`，看不到多轮版 fable-5.2 的代码，也看不到彼此的；自己截图自查，一轮做完，没有人工反馈。各自汇报的规模（未逐项核对）：
+Fable 5.2（一次性）、Opus 5.5、Sonnet 5.5、Haiku 5.5 的流程完全相同：各起一个独立的子任务（Opus、Sonnet、Haiku 在 2026-11-13，Fable 在 2026-11-14，说明文字一字不差），只给 `PROMPT.md` 和 `ref/`，看不到多轮版 `fable-5.2/` 的代码，也看不到彼此的。它们有运行环境，自己构建、截图、自查，一轮做完，没有人工反馈，发布前也没有人工改动。
 
-| 模型 | 人物 | 牲口 | 船 | 建筑 | 用时 |
-| --- | --- | --- | --- | --- | --- |
-| Fable 5.2（一次性） | 1012 | 62 | 28 | 307 | 约 67 分钟 |
-| Opus 5.5 | 1149 | 143 | 23 | 137 | 约 54 分钟 |
-| Sonnet 5.5 | 756 | 66 | 22 | 409 | 约 31 分钟 |
-| Haiku 5.5 | 375 | 17 | 12 | 72 | 约 16 分钟 |
-| GPT-6 Astra | 695 | 27 | 22 | 67 | 约 12 分钟 |
-| Gemini 4 Hydrogen | 378 | 46 | 14 | 28 | 约 12–15 分钟 |
-| Gemini 4 Carbon | 721 | 24 | 15 | 46 | 约 60 分钟（含等待回复） |
-| DeepSeek | 148 | 9 | 6 | 29 | 不详 |
-
-Claude 各版和 Astra 的数字是各自汇报的。两版 Gemini 和 DeepSeek 的数字是在修复后的页面里实际数出来的（加载时创建人物、牲口、船和房屋的函数各被调用的次数；牲口为 11 牛、8 驴、8 马、8 狗、6 骆驼、5 猪；另有城门 1 座、桥 3 座）。Gemini 的用时按 AI Studio 对话的时间戳估计：三轮分别在 11:00、11:08、11:12 开始，最后一轮的结束时间页面上看不到。
-
-
-## GPT-6 Astra 版是怎么做出来的
+### GPT-6 Astra
 
 Astra 使用 Codex CLI 和 High 推理强度，输入为合并版 `PROMPT.md` 正文、同一套 `ref/` 原画，以及 Three.js r128 和霞鹜文楷。额度中断后在原会话续跑。浏览器验收时补了实例颜色缓冲的初始化，并将河面抬高 0.01 个场景单位以消除重叠条纹。场景包含 695 个人物、27 头牲畜、22 艘船和 67 座建筑。
 
 在仓库根目录运行 `python3 gpt-6-astra/build.py` 即可从模块源码重新生成离线单页。构建使用仓库内的原画缩略图、Three.js 和已生成的字体子集。[预览截图](gpt-6-astra/preview)来自 Chrome 断网模式下的软件渲染。
 
-## 对 Gemini 4 Hydrogen 版的一处修复
-
-Gemini 是在 Google AI Studio 的对话里写出源码的，没有运行环境，不能自己构建和自查。它给的代码原样构建后打开是黑屏，报错 `ReferenceError: hatDouliGeo is not defined`：斗笠的几何体定义时叫 `douliGeo`，引用时写成了 `hatDouliGeo`。
-
-为了能对照观看，发布的 `gemini-4-hydrogen/index.html` 改了这一个名字，别的都没动：
-
-```diff
- // src/03-entities.js 第 134 行
--      hatPutouGeo, hatBunGeo, hatDouliGeo, hatScarfGeo,
-+      hatPutouGeo, hatBunGeo, hatDouliGeo: douliGeo, hatScarfGeo,
-```
-
-`gemini-4-hydrogen/src/` 里保留的是没改的原文，`gemini-4-hydrogen/index.original.html` 是原样构建的黑屏版。在这里生成的 Claude 各版都没有人工改动。
-
-## 对 Gemini 4 Carbon 版的一处修复
-
-Gemini 4 Carbon 的回答被长度上限截成几段，按它最后的说明把最后三段首尾相接才是完整的 HTML。拼好后原样打开能看到大部分画面，但每一帧渲染都报错 `TypeError: Cannot read properties of null (reading 'isInterleavedBufferAttribute')`，河面、斗笠等报错之后才画的东西出不来。原因是 three.js r128 里，共用同一材质的实例化网格如果有的设了实例颜色、有的没设，没设的那些渲染时会出错。
-
-发布的 `gemini-4-carbon/index.html` 没有改它的代码，只在 three.js 之后加了一小段脚本，让每个实例化网格一创建就带一份全白的实例颜色，并把 three.js 从 cdnjs 加载换成内嵌同一个文件：
-
-```js
-(function(){var O=THREE.InstancedMesh;function W(g,m,c){var o=new O(g,m,c);o.instanceColor=new THREE.BufferAttribute(new Float32Array(c*3).fill(1),3);return o}W.prototype=O.prototype;THREE.InstancedMesh=W})();
-```
-
-原样拼接的版本保留在 `gemini-4-carbon/index.original.html`。
-
-## 对 DeepSeek 版的一处修复
-
-DeepSeek 也是在网页对话里写出代码的，没有运行环境。它最后给的 HTML 原样打开是黑屏，报错 `TypeError: THREE.CapsuleGeometry is not a constructor`：它指定加载 three.js r128，而 r128 里没有 `CapsuleGeometry`，驴马的身子和头用到了它。
-
-发布的 `deepseek/index.html` 没有改它的代码，只在 three.js 之后加了一小段脚本，给 r128 补一个同参数的 `CapsuleGeometry`，并把 three.js 从 cdnjs 加载换成内嵌同一个文件：
-
-```js
-if(!THREE.CapsuleGeometry){THREE.CapsuleGeometry=function(r,len,capSeg,radSeg){ /* 用 LatheGeometry 旋转出胶囊形 */ }}
-```
-
-原样的黑屏版保留在 `deepseek/index.original.html`。
-
-## Token 消耗
-
-下表汇总使用合并提示词的各版用量。Claude 各版按模型调用去重后逐条加总，Astra 取 Codex CLI 会话日志的最后一笔累计值。“新输入”是没有命中缓存的输入加上写入缓存的部分；“缓存读取”是每一步重复带上的对话上下文，按次累计，所以数字很大，计费时比新输入便宜得多。
-
-| 版本 | 实际模型 | 模型调用 | 工具调用 | 输出 | 新输入 | 缓存读取 | 合计 | 用时 |
-| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | --- |
-| Fable 5.2（一次性） | `claude-fable-5-2` | 66 | 99 | 332,792 | 1,185,516 | 11,651,722 | 13,170,030 | 约 67 分钟 |
-| Opus 5.5 | `claude-opus-5-5` | 80 | 122 | 248,004 | 994,829 | 13,424,698 | 14,667,531 | 约 54 分钟 |
-| Sonnet 5.5 | `claude-sonnet-5-5` | 44 | 67 | 198,409 | 385,819 | 9,512,834 | 10,097,062 | 约 31 分钟 |
-| Haiku 5.5 | `claude-haiku-5-5` | 36 | 47 | 171,928 | 332,063 | 7,137,262 | 7,641,253 | 约 16 分钟 |
-| GPT-6 Astra | `gpt-6-astra` | 29 | 28 | 42,566 | 79,081 | 2,442,880 | 2,564,527 | 约 12 分钟 |
-| Gemini 4 Hydrogen | `gemini-4-hydrogen` | 3 | 0 | 98,990 | 1,158 | — | 100,148 | 约 12–15 分钟 |
-| Gemini 4 Carbon | `gemini-4-carbon` | 7 | 0 | 167,900 | 1,285 | — | 169,185 | 约 60 分钟（含等待回复） |
-| DeepSeek | 不详（网页版） | 14 | 0 | 不详 | 不详 | — | 不详 | 不详 |
-
-Astra 的模型调用数以累计用量发生变化的记录计，工具调用数取 CLI 中完成的工具事件（含失败的工具执行）。运行时长见下表。输出含 5,847 个推理 token。前期多轮试跑另记录 2,143,888 token（含 2,060,800 缓存读取和 41,720 输出），未计入表中。浏览器验收和随后的两处渲染修复在该会话之外完成。
-
-Gemini 的数字取自 AI Studio 页面上的 Token Usage 浮窗（输入 1,158，输出 98,990，合计 100,148）。这是整段对话占用上下文的口径：三轮里重复带上的历史没有按次累计，也看不出是否包含思考 token，所以和上面几行按调用累计的数字不能直接比。它没有工具可用，三次模型调用就是三轮回答。
-
-Gemini 4 Carbon 的数字同样取自 AI Studio 的 Token Usage 浮窗（输入 1,285，输出 167,900，合计 169,185），口径同上；用时按对话时间戳算，从 11:01 到最后一轮的 12:01，中间包含等人回复“继续”的间隔。
-
-DeepSeek 网页版不显示 token 数和用时，这两项无法统计；能数的只有文字量，14 次回答合计约 33.8 万字符。
-
-多轮版 `fable-5.2/` 是在一个同时做别的事的长对话里改出来的，用量分不开。
-
-### Astra 运行时长
+运行时长：
 
 | 运行 | 首次运行 | 续跑 | 运行合计 |
 | --- | ---: | ---: | ---: |
@@ -141,6 +127,64 @@ DeepSeek 网页版不显示 token 数和用时，这两项无法统计；能数�
 | 前期多轮试跑（第 2 轮中止） | 8 分 38 秒 | 3 分 10 秒 | **11 分 48 秒** |
 
 以上为 Codex CLI 各段从启动到结束或中止的时间，包含段内工具执行。正式版从首次启动到续跑结束共 **10 小时 54 分 57 秒**，其中 **10 小时 42 分 44 秒**为两段之间的间隔。两次实验的运行合计为 **24 分 02 秒**，按原始时间戳求和后取整。会话之外的浏览器验收和渲染修复另行完成。
+
+### Gemini 4 Hydrogen
+
+来自 Google AI Studio 里的一次对话（思考级别 High）。它没有运行环境，只在回答里写出了源码，共三轮：给出合并提示词、“继续？”、“最终的html好了吗”。`src/` 和 `build.py` 按它最后给出的版本原样保存。详见[该目录的说明](gemini-4-hydrogen/README.md)。
+
+### Gemini 4 Carbon
+
+来自 Google AI Studio 里的一次对话。回答因为单次长度上限被截断，靠“继续”接着写，共 7 轮。前三轮写的第一版被它自己放弃，第四轮起重新给了一份完整单文件版，分三段写完；按它最后的说明把这三段首尾相接才是完整的 HTML。详见[该目录的说明](gemini-4-carbon/README.md)。
+
+### DeepSeek
+
+来自 DeepSeek 网页版的一次对话，开了联网搜索。它每轮只做一步，靠“已确认”“继续”“先做细节”“做性能优化”这类简短回复推进，共 13 轮，每轮都重新给出一份完整的单页 HTML，收录的是最后一份。详见[该目录的说明](deepseek/README.md)。
+
+## 发布前做过的修复
+
+两版 Gemini 和 DeepSeek 没有运行环境，给出的代码原样打开都有问题。为了能对照观看，发布的 `index.html` 各做了一处最小修复，原样的版本保留为 `index.original.html`。
+
+| 版本 | 原样打开的表现 | 修复 |
+| --- | --- | --- |
+| Gemini 4 Hydrogen | 黑屏，`hatDouliGeo is not defined` | 改一个名字 |
+| Gemini 4 Carbon | 能看到大部分画面，但每帧报错，河面、斗笠等画不出来 | 加一段脚本补实例颜色 |
+| DeepSeek | 黑屏，`THREE.CapsuleGeometry is not a constructor` | 加一段脚本补 `CapsuleGeometry` |
+
+Astra 的两处渲染修复（实例颜色缓冲初始化、河面抬高）见[上文](#gpt-6-astra)。Claude 各版没有人工改动。
+
+### Gemini 4 Hydrogen
+
+报错 `ReferenceError: hatDouliGeo is not defined`：斗笠的几何体定义时叫 `douliGeo`，引用时写成了 `hatDouliGeo`。发布的页面改了这一个名字，别的都没动：
+
+```diff
+ // src/03-entities.js 第 134 行
+-      hatPutouGeo, hatBunGeo, hatDouliGeo, hatScarfGeo,
++      hatPutouGeo, hatBunGeo, hatDouliGeo: douliGeo, hatScarfGeo,
+```
+
+`gemini-4-hydrogen/src/` 里保留的是没改的原文。
+
+### Gemini 4 Carbon
+
+每一帧渲染都报错 `TypeError: Cannot read properties of null (reading 'isInterleavedBufferAttribute')`。原因是 three.js r128 里，共用同一材质的实例化网格如果有的设了实例颜色、有的没设，没设的那些渲染时会出错。发布的页面没有改它的代码，只在 three.js 之后加了一小段脚本，让每个实例化网格一创建就带一份全白的实例颜色，并把 three.js 从 cdnjs 加载换成内嵌同一个文件：
+
+```js
+(function(){var O=THREE.InstancedMesh;function W(g,m,c){var o=new O(g,m,c);o.instanceColor=new THREE.BufferAttribute(new Float32Array(c*3).fill(1),3);return o}W.prototype=O.prototype;THREE.InstancedMesh=W})();
+```
+
+### DeepSeek
+
+报错 `TypeError: THREE.CapsuleGeometry is not a constructor`：它指定加载 three.js r128，而 r128 里没有 `CapsuleGeometry`，驴马的身子和头用到了它。发布的页面没有改它的代码，只在 three.js 之后加了一小段脚本，给 r128 补一个同参数的 `CapsuleGeometry`，并把 three.js 从 cdnjs 加载换成内嵌同一个文件：
+
+```js
+if(!THREE.CapsuleGeometry){THREE.CapsuleGeometry=function(r,len,capSeg,radSeg){ /* 用 LatheGeometry 旋转出胶囊形 */ }}
+```
+
+## 怎么看
+
+在线看：<https://gangtao.github.io/qingming-3d/>。
+
+或者下载或克隆之后，直接用浏览器打开对应目录下的 `index.html`，不需要服务器。各版的操作大同小异：左键拖动平移，右键或 Shift 加拖动转视角，滚轮缩放；底部的缩略图条可以点击或拖动定位。
 
 ## 素材和许可
 

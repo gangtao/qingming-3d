@@ -15,6 +15,7 @@
 | [`haiku-5.5/`](haiku-5.5/) | Claude Haiku 5.5 | 同上 |
 | [`gpt-6-astra/`](gpt-6-astra/) | GPT-6 Astra | 按合并提示词和参照图生成，额度中断后在原会话续跑 |
 | [`gemini-4-hydrogen/`](gemini-4-hydrogen/) | Gemini 4 Hydrogen | Google AI Studio 对话三轮，模型没有运行环境；原样构建黑屏，改一个名字后可看，详见该目录的说明 |
+| [`deepseek/`](deepseek/) | DeepSeek（网页版，版本号不详） | chat.deepseek.com 对话 13 轮，模型没有运行环境；原样打开黑屏，补一个缺失的几何体后可看，详见该目录的说明 |
 
 ## 怎么看
 
@@ -56,8 +57,9 @@
 | Haiku 5.5 | 375 | 17 | 12 | 72 | 约 16 分钟 |
 | GPT-6 Astra | 695 | 27 | 22 | 67 | 约 12 分钟 |
 | Gemini 4 Hydrogen | 378 | 46 | 14 | 28 | 约 12–15 分钟 |
+| DeepSeek | 148 | 9 | 6 | 29 | 不详 |
 
-Claude 各版和 Astra 的数字是各自汇报的。Gemini 的数字是在修复后的页面里实际数出来的（加载时创建人物、牲口、船和房屋的函数各被调用的次数；牲口为 11 牛、8 驴、8 马、8 狗、6 骆驼、5 猪；另有城门 1 座、桥 3 座）。Gemini 的用时按 AI Studio 对话的时间戳估计：三轮分别在 11:00、11:08、11:12 开始，最后一轮的结束时间页面上看不到。
+Claude 各版和 Astra 的数字是各自汇报的。Gemini 和 DeepSeek 的数字是在修复后的页面里实际数出来的（加载时创建人物、牲口、船和房屋的函数各被调用的次数；牲口为 11 牛、8 驴、8 马、8 狗、6 骆驼、5 猪；另有城门 1 座、桥 3 座）。Gemini 的用时按 AI Studio 对话的时间戳估计：三轮分别在 11:00、11:08、11:12 开始，最后一轮的结束时间页面上看不到。
 
 
 ## GPT-6 Astra 版是怎么做出来的
@@ -80,6 +82,18 @@ Gemini 是在 Google AI Studio 的对话里写出源码的，没有运行环境�
 
 `gemini-4-hydrogen/src/` 里保留的是没改的原文，`gemini-4-hydrogen/index.original.html` 是原样构建的黑屏版。在这里生成的 Claude 各版都没有人工改动。
 
+## 对 DeepSeek 版的一处修复
+
+DeepSeek 也是在网页对话里写出代码的，没有运行环境。它最后给的 HTML 原样打开是黑屏，报错 `TypeError: THREE.CapsuleGeometry is not a constructor`：它指定加载 three.js r128，而 r128 里没有 `CapsuleGeometry`，驴马的身子和头用到了它。
+
+发布的 `deepseek/index.html` 没有改它的代码，只在 three.js 之后加了一小段脚本，给 r128 补一个同参数的 `CapsuleGeometry`，并把 three.js 从 cdnjs 加载换成内嵌同一个文件：
+
+```js
+if(!THREE.CapsuleGeometry){THREE.CapsuleGeometry=function(r,len,capSeg,radSeg){ /* 用 LatheGeometry 旋转出胶囊形 */ }}
+```
+
+原样的黑屏版保留在 `deepseek/index.original.html`。
+
 ## Token 消耗
 
 下表汇总使用合并提示词的各版用量。Claude 各版按模型调用去重后逐条加总，Astra 取 Codex CLI 会话日志的最后一笔累计值。“新输入”是没有命中缓存的输入加上写入缓存的部分；“缓存读取”是每一步重复带上的对话上下文，按次累计，所以数字很大，计费时比新输入便宜得多。
@@ -92,10 +106,13 @@ Gemini 是在 Google AI Studio 的对话里写出源码的，没有运行环境�
 | Haiku 5.5 | `claude-haiku-5-5` | 36 | 47 | 171,928 | 332,063 | 7,137,262 | 7,641,253 | 约 16 分钟 |
 | GPT-6 Astra | `gpt-6-astra` | 29 | 28 | 42,566 | 79,081 | 2,442,880 | 2,564,527 | 约 12 分钟 |
 | Gemini 4 Hydrogen | `gemini-4-hydrogen` | 3 | 0 | 98,990 | 1,158 | — | 100,148 | 约 12–15 分钟 |
+| DeepSeek | 不详（网页版） | 14 | 0 | 不详 | 不详 | — | 不详 | 不详 |
 
 Astra 的模型调用数以累计用量发生变化的记录计，工具调用数取 CLI 中完成的工具事件（含失败的工具执行）。运行时长见下表。输出含 5,847 个推理 token。前期多轮试跑另记录 2,143,888 token（含 2,060,800 缓存读取和 41,720 输出），未计入表中。浏览器验收和随后的两处渲染修复在该会话之外完成。
 
 Gemini 的数字取自 AI Studio 页面上的 Token Usage 浮窗（输入 1,158，输出 98,990，合计 100,148）。这是整段对话占用上下文的口径：三轮里重复带上的历史没有按次累计，也看不出是否包含思考 token，所以和上面几行按调用累计的数字不能直接比。它没有工具可用，三次模型调用就是三轮回答。
+
+DeepSeek 网页版不显示 token 数和用时，这两项无法统计；能数的只有文字量，14 次回答合计约 33.8 万字符。
 
 多轮版 `fable-5.2/` 是在一个同时做别的事的长对话里改出来的，用量分不开。
 

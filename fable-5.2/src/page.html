@@ -1,0 +1,77 @@
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>清明上河图 3D</title>
+<style>
+/*FONT*/
+/* 布局：整屏就是画卷；题签竖排在右上，卷轴导航压在底边，从右向左展卷 */
+:root{--silk:#d9c59a;--silk-hi:#efe2c0;--ink:#2b2018;--ink-soft:#5f4d3a;--seal:#a2301f;--line:rgba(43,32,24,.45);
+--f:"LXGW WenKai","Kaiti SC","STKaiti","KaiTi",serif;color-scheme:light}
+html,body{height:100%}
+body{background:var(--silk);color:var(--ink);font-family:var(--f);overflow:hidden;-webkit-user-select:none;user-select:none}
+#stage{position:relative;height:100%;overflow:hidden}
+#c{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none;cursor:grab}
+#c.drag{cursor:grabbing}
+#vig{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 55%,rgba(0,0,0,0) 55%,rgba(60,40,15,.28) 100%)}
+#title{position:absolute;top:calc(14px + env(safe-area-inset-top,0px));right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:row-reverse;gap:8px;align-items:flex-start;pointer-events:none}
+#title h1{margin:0;writing-mode:vertical-rl;font-size:clamp(26px,4.2vw,44px);font-weight:700;letter-spacing:.12em;line-height:1;text-shadow:0 0 12px var(--silk-hi)}
+#seal{writing-mode:vertical-rl;background:var(--seal);color:var(--silk-hi);font-size:clamp(12px,1.5vw,15px);padding:6px 3px;border-radius:3px;letter-spacing:.1em;margin-top:4px}
+#cap{position:absolute;top:calc(14px + env(safe-area-inset-top,0px));left:max(16px,env(safe-area-inset-left,0px));max-width:min(58vw,360px);pointer-events:none;background:rgba(239,226,192,.82);border:1px solid var(--line);border-radius:3px;padding:8px 12px}
+#cap b{display:block;font-size:clamp(18px,2.4vw,24px)}
+#cap span{display:block;font-size:clamp(13px,1.5vw,15px);color:var(--ink-soft);margin-top:4px;line-height:1.5}
+#tags{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.tag{position:absolute;left:0;top:0;writing-mode:vertical-rl;font-size:14px;line-height:1;padding:6px 4px;background:rgba(239,226,192,.88);border:1px solid var(--line);border-radius:2px;letter-spacing:.12em;white-space:nowrap;will-change:transform,opacity}
+.tag::after{content:"";position:absolute;left:50%;top:100%;width:1px;height:14px;background:var(--line)}
+#bar{position:absolute;left:0;right:0;bottom:0;display:flex;justify-content:center;
+padding-block:26px calc(12px + env(safe-area-inset-bottom,0px));padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+background:linear-gradient(rgba(217,197,154,0),rgba(217,197,154,.92) 55%);pointer-events:none}
+button{font:inherit;color:var(--ink);background:rgba(239,226,192,.9);border:1px solid var(--line);border-radius:3px;padding:7px 12px;font-size:15px;cursor:pointer}
+button:hover{background:var(--silk-hi)}
+button:focus-visible{outline:2px solid var(--seal);outline-offset:2px}
+button[aria-pressed="true"]{background:var(--ink);color:var(--silk-hi)}
+#track{position:relative;flex:1 1 auto;min-width:0;max-width:1180px;height:64px;pointer-events:auto;border:1px solid var(--line);border-radius:3px;background:#cdb98f /*MINIMAP*/ center/100% 100% no-repeat;cursor:ew-resize;touch-action:none;overflow:hidden}
+#track .sec{position:absolute;bottom:0;transform:translateX(-50%);font-size:12px;line-height:1;padding:3px 7px;background:rgba(239,226,192,.86);border:1px solid var(--line);border-bottom:0;border-radius:3px 3px 0 0;pointer-events:none;white-space:nowrap}
+#track .sec.on{color:var(--seal);font-weight:700}
+#thumb{position:absolute;top:0;bottom:0;border:2px solid var(--seal);border-radius:2px;background:rgba(255,250,235,.16);box-shadow:0 0 0 2000px rgba(43,32,24,.34);pointer-events:none}
+#ctl{position:absolute;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(112px + env(safe-area-inset-bottom,0px));width:214px;background:rgba(239,226,192,.9);border:1px solid var(--line);border-radius:4px;box-shadow:0 2px 10px rgba(60,40,15,.18)}
+#ctlT{display:flex;width:100%;justify-content:space-between;align-items:center;border:0;background:none;padding:8px 12px;font-size:15px;font-weight:700}
+#ctlT::after{content:"▾";font-weight:400;transition:transform .2s}
+#ctlT[aria-expanded="false"]::after{transform:rotate(180deg)}
+#ctlB{display:grid;grid-template-columns:auto 1fr;gap:8px 10px;align-items:center;padding:4px 12px 12px;border-top:1px solid var(--line);font-size:14px}
+#ctlB[hidden]{display:none}
+#ctlB input{width:100%;min-width:0;accent-color:var(--seal);margin:0}
+#ctlB .row{grid-column:1/-1;display:flex;gap:8px}
+#ctlB .row button{flex:1;padding:6px 8px;font-size:14px}
+#ctlB p{grid-column:1/-1;margin:2px 0 0;font-size:12px;line-height:1.55;color:var(--ink-soft)}
+#hint{position:absolute;left:50%;bottom:calc(92px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);font-size:13px;color:var(--ink);background:rgba(239,226,192,.88);border:1px solid var(--line);border-radius:3px;padding:5px 12px;white-space:nowrap;pointer-events:none;transition:opacity .6s}
+#hint.off{opacity:0}
+@media (max-width:640px){#hint{display:none}.tag{font-size:12px}#ctl{width:176px;bottom:calc(104px + env(safe-area-inset-bottom,0px))}#ctlB p{display:none}#cap{max-width:62vw}}
+</style>
+<div id="stage">
+<canvas id="c" aria-label="三维清明上河图长卷"></canvas>
+<div id="vig"></div>
+<div id="tags"></div>
+<div id="cap"><b id="capT"></b><span id="capD"></span></div>
+<div id="title"><h1>清明上河图</h1><div id="seal">三维长卷</div></div>
+<div id="bar">
+<div id="track" role="slider" tabindex="0" aria-label="全卷位置，可拖动" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+<i id="thumb"></i>
+<span class="sec" style="left:86.5%">郊野春色</span>
+<span class="sec" style="left:55%">汴河虹桥</span>
+<span class="sec" style="left:20%">城门街市</span>
+</div>
+</div>
+<div id="hint">拖动下面缩略图上的红框定位；画面里左键拖动平移，右键拖动转视角，滚轮缩放</div>
+<div id="ctl">
+<button id="ctlT" type="button" aria-expanded="true" aria-controls="ctlB">视角</button>
+<div id="ctlB">
+<label for="zoomR">缩放</label><input id="zoomR" type="range" min="0" max="100" value="40">
+<label for="pitchR">俯仰</label><input id="pitchR" type="range" min="0" max="100" value="32">
+<label for="yawR">旋转</label><input id="yawR" type="range" min="0" max="100" value="58">
+<div class="row"><button id="lab" type="button" aria-pressed="true">题签</button><button id="reset" type="button">复位</button></div>
+<p>左键拖动平移，右键或 Shift 加拖动转视角，滚轮缩放。</p>
+</div>
+</div>
+</div>
+<!--THREE-->
+<script>
+/*MAIN*/
+</script>

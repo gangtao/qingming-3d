@@ -31,14 +31,14 @@
 | [`sonnet-5.5/`](sonnet-5.5/) | Claude Sonnet 5.5 | 同上 | 1 | 无 |
 | [`haiku-5.5/`](haiku-5.5/) | Claude Haiku 5.5 | 同上 | 1 | 无 |
 | [`gpt-6-astra/`](gpt-6-astra/) | GPT-6 Astra | Codex CLI，额度中断后在原会话续跑 | 1（续跑一次） | 有，两处渲染修复 |
-| [`gemini-4-hydrogen/`](gemini-4-hydrogen/) | Gemini 4 Hydrogen | Google AI Studio 对话，没有运行环境 | 3 | 有，改一个名字 |
+| [`gemini-4-hydrogen/`](gemini-4-hydrogen/) | Gemini 4 Hydrogen | Google AI Studio 应用构建，有运行环境，自己截图自查 | 1 | 无 |
 | [`gemini-4-carbon/`](gemini-4-carbon/) | Gemini 4 Carbon | Google AI Studio 对话，没有运行环境 | 7 | 有，补实例颜色 |
 | [`deepseek/`](deepseek/) | DeepSeek（网页版，版本号不详） | chat.deepseek.com 对话，没有运行环境 | 13 | 有，补一个缺失的几何体 |
 
 比较时请留意条件并不完全对等：
 
 - 多轮版 `fable-5.2/` 是八轮人工反馈改出来的，其余各版只拿到合并后的提示词。
-- Claude 的四个一轮版和 Astra 有运行环境，可以自己构建、截图、改错；两版 Gemini 和 DeepSeek 只能在对话里写代码，不能运行。
+- Claude 的四个一轮版、Astra 和 Gemini 4 Hydrogen 有运行环境，可以自己构建、截图、改错；Gemini 4 Carbon 和 DeepSeek 只能在对话里写代码，不能运行。
 - DeepSeek 打不开参照图的 GitHub 链接，全卷图是后来在对话里另外附上的。
 
 ## 对照数据
@@ -52,12 +52,12 @@
 | Sonnet 5.5 | 756 | 66 | 22 | 409 | 模型自报 |
 | Haiku 5.5 | 375 | 17 | 12 | 72 | 模型自报 |
 | GPT-6 Astra | 695 | 27 | 22 | 67 | 模型自报 |
-| Gemini 4 Hydrogen | 378 | 46 | 14 | 28 | 页面实测 |
+| Gemini 4 Hydrogen | 329 | 32 | 17 | 43 | 页面实测 |
 | Gemini 4 Carbon | 721 | 24 | 15 | 46 | 页面实测 |
 | DeepSeek | 148 | 9 | 6 | 29 | 页面实测 |
 
 - “模型自报”是各模型完成时自己汇报的数字，没有逐项核对。
-- “页面实测”是在修复后的页面里数的：加载时创建人物、牲口、船和房屋的函数各被调用了多少次。细分见各自目录的说明。
+- “页面实测”是在页面里数的（Carbon 和 DeepSeek 用修复后的页面）：加载时创建人物、牲口、船和房屋的函数各被调用了多少次。细分见各自目录的说明。
 - 多轮版 `fable-5.2/` 没有统计。
 
 ### Token 和用时
@@ -69,7 +69,7 @@
 | Sonnet 5.5 | `claude-sonnet-5-5` | 44 | 67 | 198,409 | 385,819 | 9,512,834 | 10,097,062 | 约 31 分钟 |
 | Haiku 5.5 | `claude-haiku-5-5` | 36 | 47 | 171,928 | 332,063 | 7,137,262 | 7,641,253 | 约 16 分钟 |
 | GPT-6 Astra | `gpt-6-astra` | 29 | 28 | 42,566 | 79,081 | 2,442,880 | 2,564,527 | 约 12 分钟 |
-| Gemini 4 Hydrogen | `gemini-4-hydrogen` | 3 | 0 | 98,990 | 1,158 | — | 100,148 | 约 12–15 分钟 |
+| Gemini 4 Hydrogen | `gemini-4-hydrogen` | 不详 | 不详 | 不详 | 不详 | — | 不详 | 7 分 21 秒（页面显示） |
 | Gemini 4 Carbon | `gemini-4-carbon` | 7 | 0 | 167,900 | 1,285 | — | 169,185 | 约 60 分钟（含等待回复） |
 | DeepSeek | 不详（网页版） | 14 | 0 | 不详 | 不详 | — | 不详 | 不详 |
 
@@ -81,7 +81,8 @@
 
 - **Claude 的四个一轮版**：从子任务的运行记录里按模型调用去重后逐条加总，用时是子任务从开始到结束的时间。
 - **GPT-6 Astra**：取 Codex CLI 会话日志的最后一笔累计值。模型调用数以累计用量发生变化的记录计，工具调用数取 CLI 中完成的工具事件（含失败的工具执行）。输出含 5,847 个推理 token。前期多轮试跑另记录 2,143,888 token（含 2,060,800 缓存读取和 41,720 输出），未计入表中。浏览器验收和随后的两处渲染修复在该会话之外完成。运行时长的细分见[下文](#gpt-6-astra)。
-- **两版 Gemini**：取自 AI Studio 页面上的 Token Usage 浮窗。这是整段对话占用上下文的口径：各轮重复带上的历史没有按次累计，也看不出是否包含思考 token，所以和上面几行按调用累计的数字不能直接比。它们没有工具可用，模型调用数就是回答的轮数。用时按对话时间戳估计：Hydrogen 三轮分别在 11:00、11:08、11:12 开始，最后一轮的结束时间页面上看不到；Carbon 从 11:01 到最后一轮的 12:01，中间包含等人回复“继续”的间隔。
+- **Gemini 4 Hydrogen**：AI Studio 的应用构建页面不显示 token 用量，也看不到模型调用和工具调用次数。用时取页面上显示的 “Ran for 7m 21s”；项目缓存里参照图和自查截图的时间戳前后跨了约 16 分钟。
+- **Gemini 4 Carbon**：取自 AI Studio 对话页面上的 Token Usage 浮窗。这是整段对话占用上下文的口径：各轮重复带上的历史没有按次累计，也看不出是否包含思考 token，所以和上面几行按调用累计的数字不能直接比。它没有工具可用，模型调用数就是回答的轮数。用时按对话时间戳算，从 11:01 到最后一轮的 12:01，中间包含等人回复“继续”的间隔。
 - **DeepSeek**：网页版不显示 token 数和用时，这两项无法统计。能数的只有文字量，14 次回答合计约 33.8 万字符。
 - **多轮版 `fable-5.2/`**：是在一个同时做别的事的长对话里改出来的，用量分不开，没有列入。
 
@@ -130,7 +131,7 @@ Astra 使用 Codex CLI 和 High 推理强度，输入为合并版 `PROMPT.md` �
 
 ### Gemini 4 Hydrogen
 
-来自 Google AI Studio 里的一次对话（思考级别 High）。它没有运行环境，只在回答里写出了源码，共三轮：给出合并提示词、“继续？”、“最终的html好了吗”。`src/` 和 `build.py` 按它最后给出的版本原样保存。详见[该目录的说明](gemini-4-hydrogen/README.md)。
+来自 Google AI Studio 的应用构建（Build）项目。和聊天对话不同，这里它有运行环境：自己写文件、构建、用无头浏览器截图自查。输入是合并提示词和原画参照图。发布的 `index.html` 就是它自己打包出来的离线单页，没有改动；导出的项目源码在 `gemini-4-hydrogen/project/`。它用的是 three.js 0.187。这一版替换了之前收录的聊天对话版，旧版在提交历史里。详见[该目录的说明](gemini-4-hydrogen/README.md)。
 
 ### Gemini 4 Carbon
 
@@ -142,27 +143,14 @@ Astra 使用 Codex CLI 和 High 推理强度，输入为合并版 `PROMPT.md` �
 
 ## 发布前做过的修复
 
-两版 Gemini 和 DeepSeek 没有运行环境，给出的代码原样打开都有问题。为了能对照观看，发布的 `index.html` 各做了一处最小修复，原样的版本保留为 `index.original.html`。
+Gemini 4 Carbon 和 DeepSeek 没有运行环境，给出的代码原样打开都有问题。为了能对照观看，发布的 `index.html` 各做了一处最小修复，原样的版本保留为 `index.original.html`。
 
 | 版本 | 原样打开的表现 | 修复 |
 | --- | --- | --- |
-| Gemini 4 Hydrogen | 黑屏，`hatDouliGeo is not defined` | 改一个名字 |
 | Gemini 4 Carbon | 能看到大部分画面，但每帧报错，河面、斗笠等画不出来 | 加一段脚本补实例颜色 |
 | DeepSeek | 黑屏，`THREE.CapsuleGeometry is not a constructor` | 加一段脚本补 `CapsuleGeometry` |
 
-Astra 的两处渲染修复（实例颜色缓冲初始化、河面抬高）见[上文](#gpt-6-astra)。Claude 各版没有人工改动。
-
-### Gemini 4 Hydrogen
-
-报错 `ReferenceError: hatDouliGeo is not defined`：斗笠的几何体定义时叫 `douliGeo`，引用时写成了 `hatDouliGeo`。发布的页面改了这一个名字，别的都没动：
-
-```diff
- // src/03-entities.js 第 134 行
--      hatPutouGeo, hatBunGeo, hatDouliGeo, hatScarfGeo,
-+      hatPutouGeo, hatBunGeo, hatDouliGeo: douliGeo, hatScarfGeo,
-```
-
-`gemini-4-hydrogen/src/` 里保留的是没改的原文。
+Astra 的两处渲染修复（实例颜色缓冲初始化、河面抬高）见[上文](#gpt-6-astra)。Claude 各版和 Gemini 4 Hydrogen 没有人工改动。
 
 ### Gemini 4 Carbon
 

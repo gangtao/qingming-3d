@@ -1,0 +1,6 @@
+{
+  "name": "清明上河图 · 三维长卷",
+  "description": "基于北宋张择端《清明上河图》（故宫博物院藏本）逐段重建的三维交互式数字长卷，完整呈现郊野春色、汴河虹桥、城门街市三大段落与百态市井人物。",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

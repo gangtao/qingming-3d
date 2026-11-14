@@ -1,14 +1,15 @@
 # Gemini 4 Carbon 版
 
-来自 Google AI Studio 里的一次对话（模型 `gemini-4-carbon`）。它没有运行环境，不能自己构建、截图或自查，只在回答里写出了代码。
+来自 Google AI Studio 的应用构建（Build）项目，模型 `gemini-4-carbon`。和聊天对话不同，这里它有运行环境，可以自己写文件和构建。输入是合并提示词和原画参照图，一轮完成。
 
-过程：给出合并提示词后，回答因为单次长度上限被截断，靠“继续”接着写，共 7 轮（提示词、四次“继续”、一次“continue”、最后问“好了吗”）。前三轮写的第一版被它自己放弃，第四轮起重新给了一份“修复并精校后的完整单文件版”，分三段写完。对话从 11:01 开始，最后一轮在 12:01。
+- `index.html`：离线单页。导出的项目里 `standalone/index.html` 是一个 0 字节的空文件，所以这一份是收录时用它自己的构建脚本 `scripts/build-standalone.mjs` 重新打包出来的（three 0.187.0、esbuild 0.25，脚本和源码都没有改动）。在无头浏览器里打开没有报错。
+- `project/`：从 AI Studio 导出的项目源码，去掉了 AI Studio 的内部缓存目录、锁文件、模板自带的说明和那个空的 `standalone/index.html`。模块在 `project/src/qmsht/`（`00-embedded-assets.ts`、`01-primitives.ts`、`02-world.ts`、`03-actors.ts`、`04-architecture.ts`、`05-vessels.ts`、`06-scenes.ts`、`07-camera-ui.ts`）；`npm run build:standalone` 调用 `scripts/build-standalone.mjs` 打包成单页。
+- `preview/`：截图。
 
-- `index.original.html`：按它最后说明的办法，把最后三段代码首尾相接拼成的完整 HTML，除拼接外没有改动。打开后能看到大部分画面，但每一帧渲染都报错 `TypeError: Cannot read properties of null (reading 'isInterleavedBufferAttribute')`，河面、斗笠等报错之后才画的东西出不来。原因是 three.js r128 里，共用同一材质的实例化网格如果有的设了实例颜色、有的没设，没设的那些渲染时会出错。
-- `index.html`：修复后的版本，便于对照观看。页面自身的代码一行没动，只做了两处：把从 cdnjs 加载 three.js r128 换成内嵌同一个文件；在它后面加了一小段脚本，让每个实例化网格一创建就带一份全白的实例颜色。
-- `build.js`：它给的拆分和构建脚本，原样保存。试跑 `node build.js --split` 拆出了 6 个模块文件，没有拆出第 7 个，拆分结果没有收进仓库。
-- `preview/`：用修复后的 `index.html` 截的图。
+它用的是 three.js 0.187，不是提示词里举例的 r128（提示词允许内嵌任意版本）。
 
-修复后的页面加载时实际创建了 721 个人物、24 头牲口（7 马、5 驴、4 骆驼、4 猪、3 狗、1 牛）、15 条船、46 座房屋，另有城门 1 座、轿子 3 乘、车 4 辆、伞摊 10 个、柳树 79 棵、枯树 43 棵。
+页面加载时实际创建了 607 个人物、29 头牲口（9 驴、5 牛、5 马、5 骆驼、3 狗、2 猪）、17 条船、44 座房屋（36 座瓦房、8 座茅舍），另有城门 1 座、彩楼欢门 2 座、车轿 15 件（6 独轮车、4 牛车、1 平板车、4 轿子）、伞摊 17 个、柳树 43 棵、枯树 62 棵。这些是在加了计数的副本里实测的。
 
-AI Studio 页面的 Token Usage 显示输入 1,285、输出 167,900、合计 169,185 token，是整段对话占用上下文的口径，和其他版本按调用累计的统计不能直接比较。
+用时：AI Studio 页面上显示 “Ran for 19m 2s”。页面不显示 token 用量，也看不到模型调用和工具调用次数，无法统计。
+
+这一版替换了之前收录的聊天对话版（那一版模型没有运行环境，分 7 轮写完，要补实例颜色才能完整显示）；旧版在仓库的提交历史里。

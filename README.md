@@ -32,13 +32,13 @@
 | [`haiku-5.5/`](haiku-5.5/) | Claude Haiku 5.5 | 同上 | 1 | 无 |
 | [`gpt-6-astra/`](gpt-6-astra/) | GPT-6 Astra | Codex CLI，额度中断后在原会话续跑 | 1（续跑一次） | 有，两处渲染修复 |
 | [`gemini-4-hydrogen/`](gemini-4-hydrogen/) | Gemini 4 Hydrogen | Google AI Studio 应用构建，有运行环境，自己截图自查 | 1 | 无 |
-| [`gemini-4-carbon/`](gemini-4-carbon/) | Gemini 4 Carbon | Google AI Studio 对话，没有运行环境 | 7 | 有，补实例颜色 |
+| [`gemini-4-carbon/`](gemini-4-carbon/) | Gemini 4 Carbon | Google AI Studio 应用构建，有运行环境 | 1 | 无（单页由它的构建脚本重新打包） |
 | [`deepseek/`](deepseek/) | DeepSeek（网页版，版本号不详） | chat.deepseek.com 对话，没有运行环境 | 13 | 有，补一个缺失的几何体 |
 
 比较时请留意条件并不完全对等：
 
 - 多轮版 `fable-5.2/` 是八轮人工反馈改出来的，其余各版只拿到合并后的提示词。
-- Claude 的四个一轮版、Astra 和 Gemini 4 Hydrogen 有运行环境，可以自己构建、截图、改错；Gemini 4 Carbon 和 DeepSeek 只能在对话里写代码，不能运行。
+- Claude 的四个一轮版、Astra 和两个 Gemini 版有运行环境，可以自己构建、改错；DeepSeek 只能在对话里写代码，不能运行。
 - DeepSeek 打不开参照图的 GitHub 链接，全卷图是后来在对话里另外附上的。
 
 ## 对照数据
@@ -53,11 +53,11 @@
 | Haiku 5.5 | 375 | 17 | 12 | 72 | 模型自报 |
 | GPT-6 Astra | 695 | 27 | 22 | 67 | 模型自报 |
 | Gemini 4 Hydrogen | 329 | 32 | 17 | 43 | 页面实测 |
-| Gemini 4 Carbon | 721 | 24 | 15 | 46 | 页面实测 |
+| Gemini 4 Carbon | 607 | 29 | 17 | 44 | 页面实测 |
 | DeepSeek | 148 | 9 | 6 | 29 | 页面实测 |
 
 - “模型自报”是各模型完成时自己汇报的数字，没有逐项核对。
-- “页面实测”是在页面里数的（Carbon 和 DeepSeek 用修复后的页面）：加载时创建人物、牲口、船和房屋的函数各被调用了多少次。细分见各自目录的说明。
+- “页面实测”是在页面里数的（DeepSeek 用修复后的页面）：加载时创建人物、牲口、船和房屋的函数各被调用了多少次。细分见各自目录的说明。
 - 多轮版 `fable-5.2/` 没有统计。
 
 ### Token 和用时
@@ -70,7 +70,7 @@
 | Haiku 5.5 | `claude-haiku-5-5` | 36 | 47 | 171,928 | 332,063 | 7,137,262 | 7,641,253 | 约 16 分钟 |
 | GPT-6 Astra | `gpt-6-astra` | 29 | 28 | 42,566 | 79,081 | 2,442,880 | 2,564,527 | 约 12 分钟 |
 | Gemini 4 Hydrogen | `gemini-4-hydrogen` | 不详 | 不详 | 不详 | 不详 | — | 不详 | 7 分 21 秒（页面显示） |
-| Gemini 4 Carbon | `gemini-4-carbon` | 7 | 0 | 167,900 | 1,285 | — | 169,185 | 约 60 分钟（含等待回复） |
+| Gemini 4 Carbon | `gemini-4-carbon` | 不详 | 不详 | 不详 | 不详 | — | 不详 | 19 分 2 秒（页面显示） |
 | DeepSeek | 不详（网页版） | 14 | 0 | 不详 | 不详 | — | 不详 | 不详 |
 
 “新输入”是没有命中缓存的输入加上写入缓存的部分。“缓存读取”是每一步重复带上的对话上下文，按次累计，所以数字很大，计费时比新输入便宜得多。
@@ -82,7 +82,7 @@
 - **Claude 的四个一轮版**：从子任务的运行记录里按模型调用去重后逐条加总，用时是子任务从开始到结束的时间。
 - **GPT-6 Astra**：取 Codex CLI 会话日志的最后一笔累计值。模型调用数以累计用量发生变化的记录计，工具调用数取 CLI 中完成的工具事件（含失败的工具执行）。输出含 5,847 个推理 token。前期多轮试跑另记录 2,143,888 token（含 2,060,800 缓存读取和 41,720 输出），未计入表中。浏览器验收和随后的两处渲染修复在该会话之外完成。运行时长的细分见[下文](#gpt-6-astra)。
 - **Gemini 4 Hydrogen**：AI Studio 的应用构建页面不显示 token 用量，也看不到模型调用和工具调用次数。用时取页面上显示的 “Ran for 7m 21s”；项目缓存里参照图和自查截图的时间戳前后跨了约 16 分钟。
-- **Gemini 4 Carbon**：取自 AI Studio 对话页面上的 Token Usage 浮窗。这是整段对话占用上下文的口径：各轮重复带上的历史没有按次累计，也看不出是否包含思考 token，所以和上面几行按调用累计的数字不能直接比。它没有工具可用，模型调用数就是回答的轮数。用时按对话时间戳算，从 11:01 到最后一轮的 12:01，中间包含等人回复“继续”的间隔。
+- **Gemini 4 Carbon**：同样是 AI Studio 的应用构建页面，不显示 token 用量和调用次数。用时取页面上显示的 “Ran for 19m 2s”。
 - **DeepSeek**：网页版不显示 token 数和用时，这两项无法统计。能数的只有文字量，14 次回答合计约 33.8 万字符。
 - **多轮版 `fable-5.2/`**：是在一个同时做别的事的长对话里改出来的，用量分不开，没有列入。
 
@@ -135,7 +135,7 @@ Astra 使用 Codex CLI 和 High 推理强度，输入为合并版 `PROMPT.md` �
 
 ### Gemini 4 Carbon
 
-来自 Google AI Studio 里的一次对话。回答因为单次长度上限被截断，靠“继续”接着写，共 7 轮。前三轮写的第一版被它自己放弃，第四轮起重新给了一份完整单文件版，分三段写完；按它最后的说明把这三段首尾相接才是完整的 HTML。详见[该目录的说明](gemini-4-carbon/README.md)。
+同样来自 Google AI Studio 的应用构建（Build）项目，一轮完成，用的是 three.js 0.187。导出的项目里 `standalone/index.html` 是个空文件，发布的 `index.html` 是收录时用它自己的构建脚本 `scripts/build-standalone.mjs` 原样重新打包出来的，源码和脚本都没有改动；导出的项目源码在 `gemini-4-carbon/project/`。这一版替换了之前收录的聊天对话版（7 轮，没有运行环境，要补实例颜色才能完整显示），旧版在提交历史里。详见[该目录的说明](gemini-4-carbon/README.md)。
 
 ### DeepSeek
 
@@ -143,22 +143,13 @@ Astra 使用 Codex CLI 和 High 推理强度，输入为合并版 `PROMPT.md` �
 
 ## 发布前做过的修复
 
-Gemini 4 Carbon 和 DeepSeek 没有运行环境，给出的代码原样打开都有问题。为了能对照观看，发布的 `index.html` 各做了一处最小修复，原样的版本保留为 `index.original.html`。
+DeepSeek 没有运行环境，给出的代码原样打开是黑屏。为了能对照观看，发布的 `index.html` 做了一处最小修复，原样的版本保留为 `index.original.html`。
 
 | 版本 | 原样打开的表现 | 修复 |
 | --- | --- | --- |
-| Gemini 4 Carbon | 能看到大部分画面，但每帧报错，河面、斗笠等画不出来 | 加一段脚本补实例颜色 |
 | DeepSeek | 黑屏，`THREE.CapsuleGeometry is not a constructor` | 加一段脚本补 `CapsuleGeometry` |
 
-Astra 的两处渲染修复（实例颜色缓冲初始化、河面抬高）见[上文](#gpt-6-astra)。Claude 各版和 Gemini 4 Hydrogen 没有人工改动。
-
-### Gemini 4 Carbon
-
-每一帧渲染都报错 `TypeError: Cannot read properties of null (reading 'isInterleavedBufferAttribute')`。原因是 three.js r128 里，共用同一材质的实例化网格如果有的设了实例颜色、有的没设，没设的那些渲染时会出错。发布的页面没有改它的代码，只在 three.js 之后加了一小段脚本，让每个实例化网格一创建就带一份全白的实例颜色，并把 three.js 从 cdnjs 加载换成内嵌同一个文件：
-
-```js
-(function(){var O=THREE.InstancedMesh;function W(g,m,c){var o=new O(g,m,c);o.instanceColor=new THREE.BufferAttribute(new Float32Array(c*3).fill(1),3);return o}W.prototype=O.prototype;THREE.InstancedMesh=W})();
-```
+Astra 的两处渲染修复（实例颜色缓冲初始化、河面抬高）见[上文](#gpt-6-astra)。Claude 各版和两个 Gemini 版的代码没有人工改动；其中 Gemini 4 Carbon 导出的单页是空文件，发布的单页是用它自己的构建脚本重新打包的。
 
 ### DeepSeek
 

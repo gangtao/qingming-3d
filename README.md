@@ -74,7 +74,7 @@ Gemini 是在 Google AI Studio 的对话里写出源码的，没有运行环境�
 +      hatPutouGeo, hatBunGeo, hatDouliGeo: douliGeo, hatScarfGeo,
 ```
 
-`gemini-4-hydrogen/src/` 里保留的是没改的原文，`gemini-4-hydrogen/index.original.html` 是原样构建的黑屏版。其他各版都没有人工改动。
+`gemini-4-hydrogen/src/` 里保留的是没改的原文，`gemini-4-hydrogen/index.original.html` 是原样构建的黑屏版。在这里生成的 Claude 各版都没有人工改动。
 
 ## Token 消耗
 

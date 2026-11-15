@@ -8,6 +8,7 @@
 
 - [仓库里有什么](#仓库里有什么)
 - [各版本一览](#各版本一览)
+- [全卷全景](#全卷全景)
 - [对照数据](#对照数据)
 - [各版本是怎么做出来的](#各版本是怎么做出来的)
 - [发布前做过的修复](#发布前做过的修复)
@@ -40,6 +41,54 @@
 - 多轮版 `fable-5.2/` 是八轮人工反馈改出来的，其余各版只拿到合并后的提示词。
 - Claude 的四个一轮版、Astra 和两个 Gemini 版有运行环境，可以自己构建、改错；DeepSeek 只能在对话里写代码，不能运行。
 - DeepSeek 打不开参照图的 GitHub 链接，全卷图是后来在对话里另外附上的。
+
+## 全卷全景
+
+每个版本用同一个镜头把整卷一次截下来：斜俯 20 度，视场 30 度，正对卷心，拉远到刚好装下各自整卷的宽度。
+
+**Fable 5.2 多轮版**
+
+[![Fable 5.2 多轮版 全卷全景](fable-5.2/preview/panorama.jpg)](fable-5.2/)
+
+**Fable 5.2（一次性）**
+
+[![Fable 5.2（一次性） 全卷全景](fable-5.2-oneshot/preview/panorama.jpg)](fable-5.2-oneshot/)
+
+**Opus 5.5**
+
+[![Opus 5.5 全卷全景](opus-5.5/preview/panorama.jpg)](opus-5.5/)
+
+**Sonnet 5.5**
+
+[![Sonnet 5.5 全卷全景](sonnet-5.5/preview/panorama.jpg)](sonnet-5.5/)
+
+**Haiku 5.5**
+
+[![Haiku 5.5 全卷全景](haiku-5.5/preview/panorama.jpg)](haiku-5.5/)
+
+**GPT-6 Astra**
+
+[![GPT-6 Astra 全卷全景](gpt-6-astra/preview/panorama.jpg)](gpt-6-astra/)
+
+**Gemini 4 Hydrogen**
+
+[![Gemini 4 Hydrogen 全卷全景](gemini-4-hydrogen/preview/panorama.jpg)](gemini-4-hydrogen/)
+
+**Gemini 4 Carbon**
+
+[![Gemini 4 Carbon 全卷全景](gemini-4-carbon/preview/panorama.jpg)](gemini-4-carbon/)
+
+**DeepSeek**
+
+[![DeepSeek 全卷全景](deepseek/preview/panorama.jpg)](deepseek/)
+
+截图说明：
+
+- 这个视角各版页面里原本没有（拉到这么远会被各自的缩放上限和远景雾挡住），所以是在无头浏览器里用各版自己的场景另设一个镜头渲染的，并关掉了远景雾；场景本身没有改动。Opus 页面上叠的那层绢纹照原样叠回。
+- 观看方向取各版页面默认的方向。Haiku 和 DeepSeek 的场景里卷首（郊野）在左、城门在右，和原画左右相反，这是它们本来的布局。
+- 各版场景的进深不同，图片按各自内容裁掉了上下的空地，所以高度不一样。
+- 多轮版平时只显示镜头附近的分块，截图时把全部分块都显示了出来。
+- 软件渲染下 Gemini 两版会自己关掉阴影和抗锯齿。
 
 ## 对照数据
 

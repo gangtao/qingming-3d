@@ -133,6 +133,19 @@ function roof(g,w,d,y,rh,c,over){over=over||1.6;var th=THATCH.indexOf(c)>=0,W=w+
  else{box(g,0x3d3a38,W-.2,.3,.34,0,y+rh+.08,0);[-1,1].forEach(function(sx){var e=box(g,0x3d3a38,.3,.62,.3,sx*(W/2-.12),y+rh+.3,0);e.rotation.z=-sx*.45;e.castShadow=false;});
   [-1,1].forEach(function(sz){box(g,0x4a3626,W,.1,.14,0,y-drop-.02,sz*(H-.06)).castShadow=false;});}
  return R;}
+/* 收分的方台：下大上小，城台、土墙都用它 */
+var frC={};function frust(p,c,wb,db,wt,dt,h,x,y,z){var k=(wt/wb).toFixed(3)+'|'+(dt/db).toFixed(3),g=frC[k];if(!g){g=new T.BoxGeometry(1,1,1);var a=g.attributes.position;for(var i=0;i<a.count;i++)if(a.getY(i)>0){a.setX(i,a.getX(i)*wt/wb);a.setZ(i,a.getZ(i)*dt/db);}g.computeVertexNormals();frC[k]=g;}return mk(g,c,p,wb,h,db,x,y+h/2,z);}
+/* 庑殿顶：四面坡，坡面微凹，一条正脊四条垂脊，脊端鸱吻，檐角起翘 */
+function hipRoof(p,w,d,y,rh,c){var a=w/2,b=d/2,r=a-b*.8,n=6,P=[],U=[],I=[],R=pivot(p,0,y,0);
+ function patch(e0,e1,r0,r1){var base=P.length/3,W0=Math.hypot(e1[0]-e0[0],e1[1]-e0[1]),SL=Math.hypot(b,rh)*1.05;for(var i=0;i<=n;i++){var s=i/n,yy=rh*Math.pow(s,1.3)+(1-s)*(1-s)*.0;[[e0,r0,0],[e1,r1,1]].forEach(function(q){var x=q[0][0]+(q[1][0]-q[0][0])*s,z=q[0][1]+(q[1][1]-q[0][1])*s;P.push(x,yy,z);U.push(q[2]*W0/.62*(1-s*.0)+(q[2]?0:0),s*SL/1.1);});if(i<n){var k=base+i*2;I.push(k,k+1,k+2,k+1,k+3,k+2);}}}
+ patch([-a,b],[a,b],[-r,0],[r,0]);patch([a,-b],[-a,-b],[r,0],[-r,0]);patch([a,b],[a,-b],[r,0],[r,0]);patch([-a,-b],[-a,b],[-r,0],[-r,0]);
+ var g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(P,3));g.setAttribute('uv',new T.Float32BufferAttribute(U,2));g.setIndex(I);g.computeVertexNormals();var m=new T.Mesh(g,MT(c,'tile',1));m.castShadow=true;m.receiveShadow=true;R.add(m);
+ box(R,0x3d3a38,r*2+.5,.5,.5,0,rh+.15,0);
+ [-1,1].forEach(function(sx){box(R,0x2f2c2a,.6,1.3,.7,sx*(r+.1),rh+.75,0);box(R,0x2f2c2a,.45,.6,.45,sx*(r-.25),rh+1.5,0);
+  [-1,1].forEach(function(sz){var dx=sx*(a-r),dz=sz*b,L=Math.hypot(dx,dz,rh),h=pivot(R,sx*r+dx/2,rh*.46,dz/2);h.rotation.order='YXZ';h.rotation.y=Math.atan2(dx,dz);h.rotation.x=Math.atan2(rh,Math.hypot(dx,dz));box(h,0x3d3a38,.36,.36,L*.98,0,0,0).castShadow=false;
+   var t=pivot(R,sx*a,0,sz*b);t.rotation.y=Math.atan2(sx,sz);var up=box(t,0x3d3a38,.3,.3,1.6,0,.3,.5);up.rotation.x=-.5;up.castShadow=false;});});
+ [-1,1].forEach(function(s){box(R,0x4a3626,w,.16,.2,0,-.06,s*b).castShadow=false;box(R,0x4a3626,.2,.16,d,s*a,-.06,0).castShadow=false;});
+ return R;}
 var FRAME=0x5e3d2a;
 function house(g,w,d,h,o){o=o||{};var th=!!o.thatch,tile=th?pick(THATCH):pick(TILE),wall=o.wall||pick(WALLS),n=Math.max(2,Math.round(w/2.7)),bw=w/n,i;
  box(g,wall,w,h,d,0,h/2,0);

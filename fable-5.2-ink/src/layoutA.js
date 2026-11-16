@@ -26,6 +26,9 @@ var WEST=-PI/2;
  var bg=at(BC[0],BC[1],Math.atan2(-BDZ,BDX)),N=30,RED=0x8c5236;
  for(var i=0;i<N;i++){var x0=-BL+i*2*BL/N,x1=x0+2*BL/N,xm=(x0+x1)/2,y0=BH*(1-x0*x0/BL/BL),y1=BH*(1-x1*x1/BL/BL),a=Math.atan2(y1-y0,x1-x0),len=Math.hypot(x1-x0,y1-y0)+.1;
   var d=box(bg,0x9a6a48,len,.5,BW*2+.8,xm,(y0+y1)/2,0);d.rotation.z=a;
+  /* 拱骨：桥身两侧各一道厚厚的拱肋，外面钉着挡板，一根根横木的端头露在外面，下面再吊一道细的 */
+  [-1,1].forEach(function(s){var f=box(bg,0x7d5638,len,1.25,.3,xm,(y0+y1)/2-.5,s*(BW+.5));f.rotation.z=a;var f2=box(bg,0x5e3f2a,len,.22,.42,xm,(y0+y1)/2+.12,s*(BW+.52));f2.rotation.z=a;f2.castShadow=false;var f3=box(bg,0x5e3f2a,len,.2,.4,xm,(y0+y1)/2-1.12,s*(BW+.52));f3.rotation.z=a;f3.castShadow=false;
+   var e=box(bg,0x3f2c1e,.42,.42,.5,x0,y0-.5,s*(BW+.78));e.rotation.z=a;e.castShadow=false;if(i%2===0){var n2=box(bg,0x2b2018,.12,.9,.06,xm,(y0+y1)/2-.5,s*(BW+.67));n2.rotation.z=a;n2.castShadow=false;}});
   [-5.4,-2.7,0,2.7,5.4].forEach(function(z){var r=box(bg,0x6e3f2a,len,.5,.7,xm,(y0+y1)/2-.5,z);r.rotation.z=a;r.castShadow=false;});
   [-1,1].forEach(function(s){var r=box(bg,RED,len,.14,.14,xm,(y0+y1)/2+1.35,s*(BW+.15));r.rotation.z=a;r.castShadow=false;var r2=box(bg,RED,len,.1,.1,xm,(y0+y1)/2+.8,s*(BW+.15));r2.rotation.z=a;r2.castShadow=false;box(bg,RED,.18,1.4,.18,x0,y0+.8,s*(BW+.15)).castShadow=false;});}
  [-1,1].forEach(function(s){box(bg,0x8f8876,9,4.4,BW*2+2.4,s*(BL-3.2),1.3,0);});
@@ -41,40 +44,40 @@ var WEST=-PI/2;
 
 /* ---- 城墙、城门、城楼、护城河桥 ---- */
 (function(){
- var g=at(WALLX,0,0),EARTH=0xa58f63,HT=14,gz=GATEZ,GW=5.5;
- box(g,EARTH,WALLT,HT,165,0,HT/2,gz-GW-82.5);box(g,EARTH,WALLT,HT,105,0,HT/2,gz+GW+52.5);box(g,EARTH,WALLT,HT-9.5,GW*2,0,9.5+(HT-9.5)/2,gz);box(g,0x3b2b1f,WALLT-.4,.4,GW*2,0,9.3,gz);
- [-1,1].forEach(function(s){box(g,0x8f8876,WALLT+.8,9.3,1.4,0,4.65,gz+s*(GW+.5));});
- [-1,1].forEach(function(s){box(g,0xa8916a,WALLT+6,3,165,0,1.5,gz-GW-82.5).castShadow=false;});
- for(var i=0;i<26;i++){var tz=gz+(rnd()<.6?-rr(22,150):rr(22,90));var tg=tree(WALLX+rr(-10,10),tz,'bare',1.3,true);tg.position.y=HT;}
- for(var j=0;j<14;j++){tree(WALLX+WALLT/2+rr(2,7),gz+(rnd()<.5?-rr(14,120):rr(14,70)),'bare',1.5,true);}
- /* 城台：门洞两侧凸出的砖砌墩台，一层层砖缝；门洞里两排排叉柱托着过梁，两扇门朝城外敞开 */
- var BR=0x9a8a68,BRD=0x6e6048,RED=0x8c3b2a,RAIL=0x9c4a34,TW=WALLT+3;
- [-1,1].forEach(function(s){box(g,BR,TW,HT+.4,17,0,(HT+.4)/2,gz+s*(GW+8.5));
-  for(var c=1;c<9;c++)[-1,1].forEach(function(e){box(g,BRD,.08,.07,17,e*(TW/2+.03),c*1.5,gz+s*(GW+8.5)).castShadow=false;});
+ var g=at(WALLX,0,0),EARTH=0xa58f63,HT=14,WH=8.5,gz=GATEZ,GW=5.5,BR=0x9a8a68,BRD=0x6e6048,RED=0x8c3b2a,RAIL=0x9c4a34,TW=WALLT+3,PL=17;
+ /* 土城墙：夯土筑的，下宽上窄，比城台矮一截，年久失修，墙头墙坡上长满了树（原画里几乎只见树不见墙） */
+ [[-1,165],[1,105]].forEach(function(q){var s=q[0],L=q[1],z0=gz+s*(GW+PL+L/2-1);frust(g,EARTH,27,L,9,L,WH,0,0,z0);
+  for(var c=1;c<6;c++){var f=c/6,hw=13.5-(13.5-4.5)*f;[-1,1].forEach(function(e){box(g,0x8a7650,.1,.07,L,e*(hw+.03),WH*f,z0).castShadow=false;});}
+  box(g,0x97a070,8.6,.12,L,0,WH+.04,z0).castShadow=false;});
+ for(var i=0;i<34;i++){var tz=gz+(rnd()<.6?-rr(26,180):rr(26,120));var tg=tree(WALLX+rr(-3.6,3.6),tz,rnd()<.5?'bare':'willow',rr(1.1,1.6),true);tg.position.y=WH;}
+ for(var j=0;j<34;j++){var sd=rnd()<.5?-1:1,off=rr(5,12);var t2=tree(WALLX+sd*off,gz+(rnd()<.6?-rr(26,175):rr(26,115)),rnd()<.4?'bare':'willow',rr(1.2,1.8),true);t2.position.y=WH*Math.max(0,(13.5-off)/9);}
+ /* 城台：砖砌的高台，四面收分，一层层砖缝；门洞里两排排叉柱托着过梁，门额是一排木栅，两扇门朝城外敞开 */
+ [-1,1].forEach(function(s){var pz=gz+s*(GW+PL/2);frust(g,BR,TW,PL,TW-3.2,PL-.8,HT+.4,0,0,pz);
+  for(var c=1;c<12;c++){var f=c/12;[-1,1].forEach(function(e){box(g,BRD,.08,.06,PL-.8*f,e*(TW/2-1.6*f+.03),(HT+.4)*f,pz).castShadow=false;});box(g,BRD,TW-3.2*f,.06,.08,0,(HT+.4)*f,pz+s*(PL/2-.4*f+.03)).castShadow=false;}
   for(var px=-WALLT/2+1;px<=WALLT/2-1;px+=2.4)cyl(g,0x5a4028,.24,9.2,px,4.6,gz+s*(GW-.35));
   box(g,0x4a3422,WALLT,.5,.5,0,9.2,gz+s*(GW-.35));
   var dl=pivot(g,WALLT/2+.3,0,gz+s*(GW-.5));dl.rotation.y=-s*.5;box(dl,0x7a3a28,GW-.6,8.6,.3,(GW-.6)/2,4.3,0);
   for(var n=0;n<5;n++)box(dl,0x2b2018,GW-.6,.14,.4,(GW-.6)/2,.9+n*1.7,0).castShadow=false;});
+ box(g,BR,TW-2.4,HT+.4-9.6,GW*2+.9,0,(9.6+HT+.4)/2,gz);box(g,0x3b2b1f,WALLT-.4,.4,GW*2,0,9.4,gz);
  for(var bx=-WALLT/2+1;bx<=WALLT/2-1;bx+=2.4)box(g,0x4a3422,.4,.4,GW*2,bx,9.45,gz);
- /* 城楼：台基、勾栏、五间殿身、斗拱、庑殿顶、鸱吻 */
- box(g,0x8f8876,27,1.2,41,0,HT+.6,gz);box(g,0xa39a82,27.6,.3,41.6,0,HT+1.3,gz);
- [-1,1].forEach(function(s){[1.2,1.9,2.5].forEach(function(h,k){box(g,RAIL,27,k===2?.2:.12,k===2?.2:.12,0,HT+1.3+h-.2,gz+s*20.3).castShadow=false;box(g,RAIL,k===2?.2:.12,k===2?.2:.12,40.6,s*13.4,HT+1.3+h-.2,gz).castShadow=false;});
-  for(var i=0;i<=20;i++){box(g,RAIL,.22,1.5,.22,s*13.4,HT+2.05,gz-20.3+i*2.03);if(i<=13)box(g,RAIL,.22,1.5,.22,-13.4+i*2.06,HT+2.05,gz+s*20.3);}});
+ [-1,1].forEach(function(e){var fx=e*(TW/2-1.05);box(g,0x4a3422,.3,.3,GW*2+1.6,fx,11.9,gz).castShadow=false;box(g,0x4a3422,.3,.3,GW*2+.6,fx,9.7,gz).castShadow=false;for(var k=0;k<=12;k++)box(g,0x6a4a30,.22,2.2,.18,fx,10.8,gz-GW-.2+k*(GW*2+.4)/12).castShadow=false;});
+ /* 城楼：平坐斗拱挑出台沿，勾栏一圈，五间殿身，檐下斗拱，庑殿顶 */
+ for(var bq=0;bq<40;bq++)[-1,1].forEach(function(s){box(g,0x7a4a30,1.2,.55,.5,s*13.4,HT+.05,gz-20+bq*1.025).castShadow=false;if(bq<27)box(g,0x7a4a30,.5,.55,1.2,-13.3+bq*1.025,HT+.05,gz+s*20.4).castShadow=false;});
+ box(g,0x8f8876,27,.9,41,0,HT+.75,gz);box(g,0xa39a82,28.6,.3,42.6,0,HT+1.3,gz);
+ [-1,1].forEach(function(s){[1.2,1.9,2.5].forEach(function(h,k){box(g,RAIL,28,k===2?.2:.12,k===2?.2:.12,0,HT+1.3+h-.2,gz+s*20.9).castShadow=false;box(g,RAIL,k===2?.2:.12,k===2?.2:.12,41.8,s*13.9,HT+1.3+h-.2,gz).castShadow=false;});
+  for(var i2=0;i2<=20;i2++){box(g,RAIL,.22,1.5,.22,s*13.9,HT+2.05,gz-20.9+i2*2.09);if(i2<=13)box(g,RAIL,.22,1.5,.22,-13.9+i2*2.14,HT+2.05,gz+s*20.9);}});
  for(var c=0;c<8;c++)[-1,1].forEach(function(s){cyl(g,RED,.34,7,s*8.4,HT+4.7,gz-14+c*4);if(c<7){box(g,0xc9b78f,.14,2.6,3.3,s*7.3,HT+4.6,gz-12+c*4);for(var m=0;m<5;m++)box(g,0x5a3a28,.18,2.6,.07,s*7.3,HT+4.6,gz-13.3+c*4+m*.65).castShadow=false;box(g,RED,.2,.14,3.5,s*7.3,HT+3.2,gz-12+c*4);box(g,RED,.2,.14,3.5,s*7.3,HT+6,gz-12+c*4);}});
  [-1,1].forEach(function(s){for(var c=0;c<4;c++)cyl(g,RED,.34,7,-6+c*4,HT+4.7,gz+s*14.6);});
  box(g,0xa2523a,14.5,6.4,28,0,HT+4.4,gz);box(g,0x3b2b1f,14.8,3.6,4.6,0,HT+3.1,gz);box(g,0xd9c9a3,14.9,.9,27,0,HT+7,gz);
- /* 斗拱：檐下一圈小木块，一大一小交替 */
- for(var d=0;d<30;d++)[-1,1].forEach(function(s){var z0=gz-15.2+d*1.05,big=d%2===0;box(g,0x7a4a30,big?1.5:.8,big?.75:.5,.5,s*9,HT+7.9,z0);box(g,0x5a3626,big?2.2:1.2,.22,.7,s*9.2,HT+8.3,z0).castShadow=false;});
+ for(var d=0;d<30;d++)[-1,1].forEach(function(s){var z0=gz-15.2+d*1.05,big=d%2===0;box(g,0x7a4a30,big?1.5:.8,big?.75:.5,.5,s*9,HT+7.9,z0);box(g,0x5a3626,big?2.2:1.2,.22,.7,s*9.2,HT+8.3,z0).castShadow=false;if(big)box(g,0x6a4028,2.9,.2,.4,s*9.5,HT+8.6,z0).castShadow=false;});
  for(var d2=0;d2<17;d2++)[-1,1].forEach(function(s){var x0=-8.4+d2*1.05,big=d2%2===0;box(g,0x7a4a30,.5,big?.75:.5,big?1.5:.8,x0,HT+7.9,gz+s*15.6);});
- box(g,TILE[2],24,.5,38,0,HT+8.6,gz);var pv=pivot(g,0,0,gz);pv.rotation.y=PI/2;roof(pv,32,20,HT+8.8,6,TILE[0],3);
- [-1,1].forEach(function(s){var e=box(g,0x3d3a38,.5,.4,12,s*5.5,HT+11.8,gz-17.2);e.rotation.z=s*.5;e.castShadow=false;
-  box(g,0x2f2c2a,.7,1.5,.9,0,HT+15.4,gz+s*9.6);box(g,0x2f2c2a,.5,.7,.5,0,HT+16.3,gz+s*9.2);});
+ box(g,TILE[2],22,.4,34,0,HT+8.7,gz);var pv=pivot(g,0,0,gz);pv.rotation.y=PI/2;hipRoof(pv,39,27,HT+8.9,7.2,TILE[0]);
  /* 城内上城楼的踏道：一级级台阶，两边红栏杆 */
  var SN=26,SL=44,sx=-WALLT/2-4.6,sz0=gz-GW-50;
  for(var st=0;st<SN;st++){var sh=(st+1)*HT/SN;box(g,st%2?0xa89a7a:0x9c8e70,8,sh,SL/SN+.02,sx,sh/2,sz0+(st+.5)*SL/SN);}
  box(g,0xa39a82,8,HT,7,sx,HT/2,gz-GW-2.6);
  [-1,1].forEach(function(s){var ang=Math.atan2(HT,SL),L=Math.sqrt(SL*SL+HT*HT);[1.3,2].forEach(function(h){var r=box(g,RAIL,.16,.16,L,sx+s*3.9,HT/2+h,sz0+SL/2);r.rotation.x=-ang;r.castShadow=false;});
-  for(var i=0;i<=13;i++)box(g,RAIL,.2,2.1,.2,sx+s*3.9,(i/13)*HT+1.05,sz0+i*SL/13);});
+  for(var i3=0;i3<=13;i3++)box(g,RAIL,.2,2.1,.2,sx+s*3.9,(i3/13)*HT+1.05,sz0+i3*SL/13);});
  label('城门',WALLX+WALLT/2,HT+19,gz);
  /* 护城河上的平桥 */
  var b=at(MOATX,roadZ(MOATX),0),bz=0;box(b,0xb39a6a,MOATHW*2+6,.24,17,0,.13,0).castShadow=false;

@@ -48,7 +48,7 @@ function roadZ(x){var k=Math.round(x/4);for(var d=0;d<40;d++){if(roadZx[k+d]!=nu
 function sidePath(arr,hw){var pts=arr.map(function(a){return a.length===3?TP(a[0],a[1],a[2]):a;});var tb=tableOf(curveOf(pts),Math.max(20,pts.length*14));ribbonOf(tb,hw||3.5,.035,0xe6d6ae,0);var out=[];for(var i=0;i<tb.length;i++)out.push([tb[i].x,tb[i].z]);return out;}
 
 /* 虹桥：从北岸的桥头斜着跨到西南岸 */
-var BE=TP(8,1080,170),BWp=TP(9,1480,780),BC=[(BE[0]+BWp[0])/2,(BE[1]+BWp[1])/2],BL=Math.hypot(BE[0]-BWp[0],BE[1]-BWp[1])/2,BW=6.5,BH=11,BDX=(BE[0]-BWp[0])/(2*BL),BDZ=(BE[1]-BWp[1])/(2*BL);
+var BE=TP(8,1080,170),BWp=TP(9,1480,780),BC=[(BE[0]+BWp[0])/2,(BE[1]+BWp[1])/2],BL=Math.hypot(BE[0]-BWp[0],BE[1]-BWp[1])/2,BW=6.5,BH=13.5,BDX=(BE[0]-BWp[0])/(2*BL),BDZ=(BE[1]-BWp[1])/(2*BL);
 function groundY(x,z){var rx=x-BC[0],rz=z-BC[1],lx=rx*BDX+rz*BDZ,lz=-rx*BDZ+rz*BDX;if(abs(lx)<BL&&abs(lz)<BW)return BH*(1-(lx/BL)*(lx/BL))+.3;return 0;}
 var WALLX=-385,WALLT=30,GATEZ=roadAt(sNear(-385,16),0,ro).z;
 function squeeze(x,z){if(groundY(x,z)>0)return .62;if(abs(x-WALLX)<WALLT/2+6)return .5;if(abs(x-TP(1,480,0)[0])<9)return .4;return 1;}

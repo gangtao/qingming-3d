@@ -1,0 +1,9 @@
+/* ---------- 招牌、炊烟、飞鸟和更多小场景 ---------- */
+function sign(g,txt,x,z,o){o=o||{};var n=txt.length,cs=Math.min(.74,4.8/n),h=cs*n+.2,cv=document.createElement('canvas');cv.width=64;cv.height=64*n+16;var tex=new T.CanvasTexture(cv);
+ function draw(){var c=cv.getContext('2d');c.fillStyle=o.dark?'#3b2b1f':'#efe2c0';c.fillRect(0,0,cv.width,cv.height);c.strokeStyle=o.dark?'#d6b24a':'#5f4d3a';c.lineWidth=4;c.strokeRect(2,2,cv.width-4,cv.height-4);c.fillStyle=o.dark?'#f0dfae':'#2b2018';c.font='50px "LXGW WenKai","Kaiti SC",serif';c.textAlign='center';c.textBaseline='middle';for(var i=0;i<n;i++)c.fillText(txt[i],32,8+32+i*64);tex.needsUpdate=true;}
+ draw();signs.push(draw);var y0=o.y||1;var mt=new T.MeshLambertMaterial({map:tex});var m=new T.Mesh(GP,mt);m.scale.set(cs+.16,h,1);m.position.set(x,y0+h/2,z);m.castShadow=true;g.add(m);var m2=new T.Mesh(GP,mt);m2.scale.copy(m.scale);m2.position.set(x,y0+h/2,z-.17);m2.rotation.y=PI;g.add(m2);
+ box(g,0x4a3626,.1,y0+h+.15,.1,x,(y0+h+.15)/2,z-.085);return m;}
+function smoke(x,y,z){var g=new T.Group(),ps=[];for(var i=0;i<4;i++){var m=new T.Mesh(GS,new T.MeshLambertMaterial({color:0xf4eedd,transparent:true,opacity:.5,depthWrite:false}));g.add(m);ps.push(m);}scene.add(g);
+ actors.push({g:g,x:x,pose:function(t){for(var i=0;i<4;i++){var k=((t*.2+i/4+x)%1+1)%1,m=ps[i];m.position.set(x+k*k*3.5,y+k*7,z);m.scale.setScalar(.45+k*1.5);m.material.opacity=.55*(1-k);}}});}
+function flock(y,z,v,x0){var g=new T.Group(),ws=[];for(var i=0;i<7;i++){var b=pivot(g,abs(i-3)*1.7,rr(-.4,.4),(i-3)*1.5);box(b,0x2b2018,.6,.1,.14,0,0,0);[-1,1].forEach(function(s){var w=pivot(b,0,0,s*.07);box(w,0x2b2018,.22,.03,.7,0,0,s*.35);ws.push({w:w,s:s,ph:i});});}
+ g.position.set(x0,y,z);scene.add(g);actors.push({g:g,x:x0,step:function(dt){this.x-=v*dt;if(this.x<-640)this.x=640;g.position.x=this.x;},pose:function(t){for(var i=0;i<ws.length;i++)ws[i].w.rotation.x=ws[i].s*sin(t*7+ws[i].ph)*.6;}});}

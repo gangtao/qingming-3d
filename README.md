@@ -27,6 +27,7 @@
 | 目录 | 模型 | 生成方式 | 轮数 | 发布前有无修复 |
 | --- | --- | --- | ---: | --- |
 | [`fable-5.2/`](fable-5.2/) | Claude Fable 5.2 | 有人反馈的多轮对话，逐步改成 | 8 | 无 |
+| [`fable-5.2-ink/`](fable-5.2-ink/) | Claude Fable 5.2 | 在多轮版基础上继续按反馈改进：白描淡彩画风、船只航行、更贴近原画 | 8 + 后续多轮 | 无 |
 | [`fable-5.2-oneshot/`](fable-5.2-oneshot/) | Claude Fable 5.2 | 独立子任务，有运行环境，自己截图自查 | 1 | 无 |
 | [`opus-5.5/`](opus-5.5/) | Claude Opus 5.5 | 同上 | 1 | 无 |
 | [`sonnet-5.5/`](sonnet-5.5/) | Claude Sonnet 5.5 | 同上 | 1 | 无 |
@@ -49,6 +50,10 @@
 **Fable 5.2 多轮版**
 
 [![Fable 5.2 多轮版 全卷全景](fable-5.2/preview/panorama.jpg)](fable-5.2/)
+
+**Fable 5.2 多轮版（白描改进版，界面截图，非同一机位）**
+
+[![Fable 5.2 白描改进版 全卷](fable-5.2-ink/preview/all.jpg)](fable-5.2-ink/)
 
 **Fable 5.2（一次性）**
 

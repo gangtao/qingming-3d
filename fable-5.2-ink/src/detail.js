@@ -1,7 +1,20 @@
 /* ---------- 细节：贴图、合并网格 ---------- */
 function texOf(sz,draw,rx,ry){var cv=document.createElement('canvas');cv.width=cv.height=sz;var c=cv.getContext('2d');c.fillStyle='#fff';c.fillRect(0,0,sz,sz);draw(c,sz);var t=new T.CanvasTexture(cv);t.wrapS=t.wrapT=T.RepeatWrapping;if(rx)t.repeat.set(rx,ry);return t;}
 var TX={
- tile:texOf(32,function(c,s){var g=c.createLinearGradient(0,0,s,0);g.addColorStop(0,'#777');g.addColorStop(.18,'#c8c8c8');g.addColorStop(.5,'#fff');g.addColorStop(.82,'#c8c8c8');g.addColorStop(1,'#777');c.fillStyle=g;c.fillRect(0,0,s,s);c.fillStyle='rgba(0,0,0,.22)';for(var y=0;y<s;y+=8)c.fillRect(0,y,s,1);}),
+ /* 瓦面：不用圆滚滚的明暗渐变，改成手画的样子——一道道深浅不匀的瓦垄线，垄间是一排排短弧的瓦口，再罩几块浓淡 */
+ tile:texOf(128,function(c,s){c.fillStyle='#e9e9e9';c.fillRect(0,0,s,s);var i,y,x;
+  for(i=0;i<26;i++){c.fillStyle='rgba(0,0,0,'+rr(.03,.09)+')';c.beginPath();c.ellipse(rnd()*s,rnd()*s,rr(10,34),rr(6,20),rnd()*3,0,6.3);c.fill();}
+  for(x=0;x<s;x+=16){c.strokeStyle='rgba(20,14,8,'+rr(.5,.8)+')';c.lineWidth=rr(1.6,2.6);c.beginPath();c.moveTo(x+8,0);for(y=0;y<=s;y+=16)c.lineTo(x+8+rr(-.7,.7),y);c.stroke();
+   c.strokeStyle='rgba(20,14,8,.34)';c.lineWidth=1;for(y=(x/16%2)*5;y<s;y+=10){c.beginPath();c.arc(x,y+rr(-.6,.6),6.2,.25,2.9);c.stroke();}}
+  c.strokeStyle='rgba(20,14,8,.16)';c.lineWidth=1;for(y=0;y<s;y+=32){c.beginPath();c.moveTo(0,y+rr(-1,1));c.lineTo(s,y+rr(-1,1));c.stroke();}},.125,.25),
+ /* 墙面：淡墨罩染，上浅下深，带水渍、雨痕和几笔干刷 */
+ wash:texOf(128,function(c,s){var g=c.createLinearGradient(0,0,0,s);g.addColorStop(0,'#f4f4f4');g.addColorStop(.6,'#ececec');g.addColorStop(1,'#cdcdcd');c.fillStyle=g;c.fillRect(0,0,s,s);var i;
+  for(i=0;i<22;i++){c.fillStyle='rgba(0,0,0,'+rr(.03,.1)+')';c.beginPath();c.ellipse(rnd()*s,rnd()*s,rr(8,30),rr(5,18),rnd()*3,0,6.3);c.fill();}
+  for(i=0;i<34;i++){c.fillStyle='rgba(30,20,10,'+rr(.05,.16)+')';c.fillRect(rnd()*s,rnd()*s*.5,rr(.8,1.8),rr(14,60));}
+  for(i=0;i<16;i++){c.strokeStyle='rgba(30,20,10,'+rr(.06,.14)+')';c.lineWidth=rr(.6,1.4);var y=rnd()*s,x=rnd()*s;c.beginPath();c.moveTo(x,y);c.lineTo(x+rr(18,50),y+rr(-2,2));c.stroke();}
+  for(i=0;i<260;i++){c.fillStyle='rgba(0,0,0,'+rr(.04,.12)+')';c.fillRect(rnd()*s,rnd()*s,1,1);}}),
+ /* 木料：顺纹的几道深浅 */
+ wood:texOf(64,function(c,s){c.fillStyle='#ececec';c.fillRect(0,0,s,s);for(var i=0;i<26;i++){c.fillStyle='rgba(20,12,6,'+rr(.08,.28)+')';c.fillRect(rnd()*s,0,rr(.6,2),s);}for(i=0;i<5;i++){c.fillStyle='rgba(0,0,0,.12)';c.fillRect(0,rnd()*s,s,rr(1,3));}}),
  thatch:texOf(64,function(c,s){for(var i=0;i<150;i++){c.fillStyle=pick(['rgba(0,0,0,.2)','rgba(0,0,0,.1)','rgba(90,60,20,.22)']);c.fillRect(rnd()*s,rnd()*s,1.4,rr(8,22));}c.fillStyle='rgba(0,0,0,.14)';for(var y=0;y<s;y+=21)c.fillRect(0,y,s,2);}),
  plank:texOf(32,function(c,s){c.fillStyle='rgba(0,0,0,.3)';for(var y=0;y<s;y+=8)c.fillRect(0,y,s,1.5);c.fillStyle='rgba(0,0,0,.14)';c.fillRect(7,0,1,8);c.fillRect(22,8,1,8);c.fillRect(13,16,1,8);c.fillRect(27,24,1,8);}),
  lattice:texOf(32,function(c,s){c.fillStyle='#e6d8b4';c.fillRect(0,0,s,s);c.strokeStyle='#4a3020';c.lineWidth=2;for(var i=0;i<=s;i+=8){c.beginPath();c.moveTo(i,0);c.lineTo(i,s);c.stroke();c.beginPath();c.moveTo(0,i);c.lineTo(s,i);c.stroke();}},2,1),

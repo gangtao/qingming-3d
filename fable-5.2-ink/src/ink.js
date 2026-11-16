@@ -9,20 +9,31 @@ var INK=(function(){
   'float lum(vec2 u){return dot(texture2D(tC,u).rgb,vec3(.3,.59,.11));}',
   'float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}',
   'float vn(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(h(i),h(i+vec2(1,0)),f.x),mix(h(i+vec2(0,1)),h(i+vec2(1,1)),f.x),f.y);}',
-  'void main(){vec2 o=px*lw;',
-  ' float d=lin(v),dl=lin(v-vec2(o.x,0.)),dr=lin(v+vec2(o.x,0.)),du=lin(v+vec2(0.,o.y)),dd=lin(v-vec2(0.,o.y));',
+  'void main(){',
+  /* 手抖：取样位置按低频噪声挪一点，直线就不再像尺子画的；线的粗细也跟着变 */
+  ' vec2 w=v+(vec2(vn(v*vec2(140.,80.)),vn(v*vec2(140.,80.)+9.))-.5)*px*3.4;',
+  ' float lv=.62+.85*vn(v*vec2(52.,30.)+2.);vec2 o=px*lw*lv;',
+  ' float d=lin(w),dl=lin(w-vec2(o.x,0.)),dr=lin(w+vec2(o.x,0.)),du=lin(w+vec2(0.,o.y)),dd=lin(w-vec2(0.,o.y));',
   /* 深度的二阶差分：物体轮廓和折线处大，平坦斜面上为零 */
   ' float e1=(abs(dl+dr-2.*d)+abs(du+dd-2.*d))/d;float eD=smoothstep(.006,.022,e1);',
-  ' float l=lum(v),gx=lum(v+vec2(o.x,0.))-lum(v-vec2(o.x,0.)),gy=lum(v+vec2(0.,o.y))-lum(v-vec2(0.,o.y));',
+  ' float l=lum(w),gx=lum(w+vec2(o.x,0.))-lum(w-vec2(o.x,0.)),gy=lum(w+vec2(0.,o.y))-lum(w-vec2(0.,o.y));',
   ' float eC=smoothstep(.07,.26,length(vec2(gx,gy)));',
-  ' float far=smoothstep(600.,220.,d*ek);float edge=clamp(eD*.9+eC*.5,0.,1.)*mix(.35,1.,far)*ek;',
-  ' vec3 c=texture2D(tC,v).rgb;float g=dot(c,vec3(.3,.59,.11));',
+  /* 飞白：墨线时浓时淡，偶尔断一下 */
+  ' float dry=.55+.6*vn(v*vec2(230.,130.)+5.);',
+  ' float far=smoothstep(600.,220.,d*ek);float edge=clamp(eD*.9+eC*.5,0.,1.)*mix(.35,1.,far)*ek*dry;',
+  /* 积墨：轮廓外侧一圈淡淡的晕，像颜料在线边沉下来 */
+  ' vec2 o3=o*3.2;float e3=(abs(lin(w-vec2(o3.x,0.))+lin(w+vec2(o3.x,0.))-2.*d)+abs(lin(w+vec2(0.,o3.y))+lin(w-vec2(0.,o3.y))-2.*d))/d;float pool=smoothstep(.02,.12,e3)*ek;',
+  ' vec3 c=texture2D(tC,w).rgb;float g=dot(c,vec3(.3,.59,.11));',
   ' vec3 silk=vec3(.76,.635,.42);',
   /* 淡彩：压低彩度，再整体罩一层绢色 */
   ' c=mix(vec3(g),c,.56);c=mix(c,silk*(.38+g*.86),.5);',
+  ' vec2 fp=gl_FragCoord.xy;',
+  /* 设色不匀：大块的浓淡加上细的颗粒 */
+  ' c*=1.+(vn(fp*.035+11.)-.5)*.085+(vn(fp*.42)-.5)*.07;',
+  ' c*=1.-pool*.13;',
   ' c=mix(c,vec3(.17,.12,.08),edge*.82);',
   /* 绢的经纬和年久的斑驳 */
-  ' vec2 fp=gl_FragCoord.xy;float weave=.5+.25*sin(fp.x*1.9)+.25*sin(fp.y*1.9);',
+  ' float weave=.5+.25*sin(fp.x*1.9)+.25*sin(fp.y*1.9);',
   ' float st=vn(v*vec2(5.,2.4)+3.)*.6+vn(v*vec2(17.,9.))*.4;',
   ' c*=mix(.98,1.012,weave)*mix(.87,1.06,st);',
   ' vec2 q=v-.5;c*=1.-dot(q,q)*.28;',

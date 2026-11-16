@@ -11,8 +11,8 @@ renderer.shadowMap.enabled=false;/* 国画不画投影 */renderer.shadowMap.type
 var SILK=0xd9c59a;
 var scene=new T.Scene();scene.background=new T.Color(SILK);scene.fog=new T.Fog(SILK,130,300);
 var cam=new T.PerspectiveCamera(28,1,2,1100);
-scene.add(new T.HemisphereLight(0xfff6e0,0x9c8660,0.66));
-var sun=new T.DirectionalLight(0xfff1d6,0.5);sun.castShadow=true;
+scene.add(new T.HemisphereLight(0xfff6e0,0xc2ae84,0.9));
+var sun=new T.DirectionalLight(0xfff1d6,0.17);sun.castShadow=true;
 sun.shadow.mapSize.set(4096,4096);var sc=sun.shadow.camera;sc.left=-190;sc.right=190;sc.top=170;sc.bottom=-170;sc.near=10;sc.far=520;sun.shadow.bias=-0.0006;
 scene.add(sun);scene.add(sun.target);
 

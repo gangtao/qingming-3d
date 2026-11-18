@@ -33,6 +33,7 @@
 | [`sonnet-5.5/`](sonnet-5.5/) | Claude Sonnet 5.5 | 同上 | 1 | 无 |
 | [`haiku-5.5/`](haiku-5.5/) | Claude Haiku 5.5 | 同上 | 1 | 无 |
 | [`gpt-6-astra/`](gpt-6-astra/) | GPT-6 Astra | Codex CLI，额度中断后在原会话续跑 | 1（续跑一次） | 有，两处渲染修复 |
+| [`gpt-6-2-astra/`](gpt-6-2-astra/) | GPT-6.2 Astra | Codex 参照原画分图布景，用 Chrome 离线截图自查 | 1 | 无 |
 | [`gemini-4-hydrogen/`](gemini-4-hydrogen/) | Gemini 4 Hydrogen | Google AI Studio 应用构建，有运行环境，自己截图自查 | 1 | 无 |
 | [`gemini-4-carbon/`](gemini-4-carbon/) | Gemini 4 Carbon | Google AI Studio 应用构建，有运行环境 | 1 | 无（单页由它的构建脚本重新打包） |
 | [`deepseek/`](deepseek/) | DeepSeek（网页版，版本号不详） | chat.deepseek.com 对话，没有运行环境 | 13 | 有，补一个缺失的几何体 |
@@ -40,7 +41,7 @@
 比较时请留意条件并不完全对等：
 
 - 多轮版 `fable-5.2/` 是八轮人工反馈改出来的，其余各版只拿到合并后的提示词。
-- Claude 的四个一轮版、Astra 和两个 Gemini 版有运行环境，可以自己构建、改错；DeepSeek 只能在对话里写代码，不能运行。
+- Claude 的四个一轮版、两个 Astra 版和两个 Gemini 版有运行环境，可以自己构建、改错；DeepSeek 只能在对话里写代码，不能运行。
 - DeepSeek 打不开参照图的 GitHub 链接，全卷图是后来在对话里另外附上的。
 
 ## 全卷全景
@@ -183,6 +184,12 @@ Astra 使用 Codex CLI 和 High 推理强度，输入为合并版 `PROMPT.md` �
 
 以上为 Codex CLI 各段从启动到结束或中止的时间，包含段内工具执行。正式版从首次启动到续跑结束共 **10 小时 54 分 57 秒**，其中 **10 小时 42 分 44 秒**为两段之间的间隔。两次实验的运行合计为 **24 分 02 秒**，按原始时间戳求和后取整。会话之外的浏览器验收和渲染修复另行完成。
 
+### GPT-6.2 Astra
+
+Codex 按 `PROMPT.md` 对照 `ref/` 的十六张分图布景。打开页面时，镜头停在虹桥；点击底部的原画缩略图，可以向右到郊野，向左进城。在仓库根目录运行 `python3 gpt-6-2-astra/build.py` 可从模块源码重建离线单页。
+
+三个段落都在 Chrome 断网模式下打开并截图检查。[郊野春色](gpt-6-2-astra/preview/country.jpg) · [汴河虹桥](gpt-6-2-astra/preview/bridge.jpg) · [城门街市](gpt-6-2-astra/preview/city.jpg)
+
 ### Gemini 4 Hydrogen
 
 来自 Google AI Studio 的应用构建（Build）项目。和聊天对话不同，这里它有运行环境：自己写文件、构建、用无头浏览器截图自查。输入是合并提示词和原画参照图。发布的 `index.html` 就是它自己打包出来的离线单页，没有改动；导出的项目源码在 `gemini-4-hydrogen/project/`。它用的是 three.js 0.187。这一版替换了之前收录的聊天对话版，旧版在提交历史里。详见[该目录的说明](gemini-4-hydrogen/README.md)。
@@ -203,7 +210,7 @@ DeepSeek 没有运行环境，给出的代码原样打开是黑屏。为了能�
 | --- | --- | --- |
 | DeepSeek | 黑屏，`THREE.CapsuleGeometry is not a constructor` | 加一段脚本补 `CapsuleGeometry` |
 
-Astra 的两处渲染修复（实例颜色缓冲初始化、河面抬高）见[上文](#gpt-6-astra)。Claude 各版和两个 Gemini 版的代码没有人工改动；其中 Gemini 4 Carbon 导出的单页是空文件，发布的单页是用它自己的构建脚本重新打包的。
+GPT-6 Astra 的两处渲染修复（实例颜色缓冲初始化、河面抬高）见[上文](#gpt-6-astra)。Claude 各版和两个 Gemini 版的代码没有人工改动；其中 Gemini 4 Carbon 导出的单页是空文件，发布的单页是用它自己的构建脚本重新打包的。
 
 ### DeepSeek
 

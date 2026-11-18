@@ -42,7 +42,7 @@ function resize(){var st=document.getElementById('stage');W=st.clientWidth;H=st.
 window.addEventListener('resize',resize);resize();
 
 var v3=new T.Vector3(),last=performance.now(),time=0;
-function frame(now){var dt=Math.max(0,Math.min(.05,(now-last)/1000));last=now;time+=dt;update(dt);if(!__q.skip)INK.render(scene,cam);requestAnimationFrame(frame);}
+function frame(now){var dt=Math.max(0,Math.min(.05,(now-last)/1000));last=now;time+=dt;update(dt);INK.render(scene,cam);requestAnimationFrame(frame);}
 function update(dt){
  if(auto){tgtX-=8*dt;if(tgtX<=XMIN){tgtX=XMIN;setAuto(false);}}
  camX+=(tgtX-camX)*Math.min(1,dt*4);dist+=(tgtDist-dist)*Math.min(1,dt*5);
@@ -65,7 +65,7 @@ function update(dt){
 }
 tags.forEach(function(g){g.e.style.opacity=0;g.e.style.transition='opacity .4s';});
 document.fonts&&document.fonts.load('50px "LXGW WenKai"','酒').then(function(){signs.forEach(function(d){d();});});
-window.__q={rec:function(x,z,d,el,yw){camX=tgtX=x;dist=tgtDist=d;EL=tgtEL=el;YAW=tgtYaw=yw;camZ=1e9;var rz=roadZ(x),zt=rz+(4-rz)*Math.max(0,Math.min(1,(d-45)/70));zOff=tgtZOff=z-zt;setAuto(false);},skip:false,riverAt:riverAt,RLEN:RLEN,boats:boats,seek:function(x,d,el,yw){camX=tgtX=x;camZ=1e9;if(d)dist=tgtDist=d;if(el!=null)EL=tgtEL=el;if(yw!=null)YAW=tgtYaw=yw;setAuto(false);},n:function(){return actors.length;},calls:function(){return renderer.info.render.calls;}};
+window.__q={riverAt:riverAt,RLEN:RLEN,boats:boats,seek:function(x,d,el,yw){camX=tgtX=x;camZ=1e9;if(d)dist=tgtDist=d;if(el!=null)EL=tgtEL=el;if(yw!=null)YAW=tgtYaw=yw;setAuto(false);},n:function(){return actors.length;},calls:function(){return renderer.info.render.calls;}};
 flags.forEach(function(f){f.userData.dyn=true;});sways.forEach(function(s){s.g.userData.dyn=true;});
 fronts.forEach(function(f){if(!f.act)bake(f.g);});sways.forEach(function(s){bake(s.g);});
 requestAnimationFrame(frame);
